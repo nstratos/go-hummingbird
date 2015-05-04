@@ -36,7 +36,7 @@ func TestUserService_Authenticate(t *testing.T) {
 
 	client.User.SetCredentials("TestUser", "", "TestPass")
 
-	mux.HandleFunc("/users/authenticate", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/v1/users/authenticate", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 		testBody(t, r, `{"username":"TestUser","email":"","password":"TestPass"}`)
 		fmt.Fprintf(w, `"token1234"`)
@@ -57,7 +57,7 @@ func TestUserService_Authenticate_unauthorized(t *testing.T) {
 
 	client.User.SetCredentials("InvalidTestUser", "", "TestPass")
 
-	mux.HandleFunc("/users/authenticate", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/v1/users/authenticate", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 		testBody(t, r, `{"username":"InvalidTestUser","email":"","password":"TestPass"}`)
 		http.Error(w, `{"error":"invalid credentials"}`, http.StatusUnauthorized)
@@ -73,7 +73,7 @@ func TestUserService_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/users/TestUser", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/v1/users/TestUser", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		testResourceID(t, r, "TestUser")
 		fmt.Fprintf(w, `{"name":"TestUser","bio":"My bio."}`)

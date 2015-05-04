@@ -34,25 +34,25 @@ import (
 //     "favorites": [ *omitted* ]
 //   }
 type User struct {
-	Name                    string     `json:"name"`
-	Waifu                   string     `json:"waifu"`
-	WaifuOrHusbando         string     `json:"waifu_or_husbando"`
-	WaifuSlug               string     `json:"waifu_slug"`
-	WaifuCharID             string     `json:"waifu_char_id"`
-	Location                string     `json:"location"`
-	Website                 string     `json:"website"`
-	Avatar                  string     `json:"website"`
-	CoverImage              string     `json:"cover_image"`
-	About                   string     `json:"about"`
-	Bio                     string     `json:"bio"`
-	Karma                   int        `json:"karma"`
-	LifeSpentOnAnime        int        `json:"life_spent_on_anime"`
-	ShowAdultContent        bool       `json:"show_adult_content"`
-	TitleLanguagePreference string     `json:"title_language_preference"`
-	LastLibraryUpdate       time.Time  `json:"last_library_update"`
-	Online                  bool       `json:"online"`
-	Following               bool       `json:"following"`
-	Favorites               []Favorite `json:"favorites"`
+	Name                    string     `json:"name,omitempty"`
+	Waifu                   string     `json:"waifu,omitempty"`
+	WaifuOrHusbando         string     `json:"waifu_or_husbando,omitempty"`
+	WaifuSlug               string     `json:"waifu_slug,omitempty"`
+	WaifuCharID             string     `json:"waifu_char_id,omitempty"`
+	Location                string     `json:"location,omitempty"`
+	Website                 string     `json:"website,omitempty"`
+	Avatar                  string     `json:"website,omitempty"`
+	CoverImage              string     `json:"cover_image,omitempty"`
+	About                   string     `json:"about,omitempty"`
+	Bio                     string     `json:"bio,omitempty"`
+	Karma                   int        `json:"karma,omitempty"`
+	LifeSpentOnAnime        int        `json:"life_spent_on_anime,omitempty"`
+	ShowAdultContent        bool       `json:"show_adult_content,omitempty"`
+	TitleLanguagePreference string     `json:"title_language_preference,omitempty"`
+	LastLibraryUpdate       *time.Time `json:"last_library_update,omitempty"`
+	Online                  bool       `json:"online,omitempty"`
+	Following               bool       `json:"following,omitempty"`
+	Favorites               []Favorite `json:"favorites,omitempty"`
 }
 
 // Favorite represents a favorite item of a Hummingbird user.
@@ -95,7 +95,7 @@ func (s *UserService) SetCredentials(username, email, password string) {
 // Authenticate a user and return an authentication token if successful. That
 // authentication token can be used in other methods that require authentication.
 func (s *UserService) Authenticate() (string, error) {
-	const urlStr = "users/authenticate"
+	const urlStr = "api/v1/users/authenticate"
 	endpoint, _ := url.Parse(urlStr)
 	u := s.client.BaseURL.ResolveReference(endpoint)
 
@@ -133,7 +133,7 @@ func (s *UserService) Authenticate() (string, error) {
 
 // Get information about a user. Does not require authentication.
 func (s *UserService) Get(username string) (*User, error) {
-	endpoint, _ := url.Parse(fmt.Sprintf("users/%s", username))
+	endpoint, _ := url.Parse(fmt.Sprintf("api/v1/users/%s", username))
 	u := s.client.BaseURL.ResolveReference(endpoint)
 
 	resp, err := http.Get(u.String())
