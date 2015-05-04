@@ -69,6 +69,13 @@ func TestUserService_Authenticate_unauthorized(t *testing.T) {
 	}
 }
 
+func TestUserService_Authenticate_credentialsNotSet(t *testing.T) {
+	_, err := client.User.Authenticate()
+	if err == nil {
+		t.Errorf("Expected credentials not set error.")
+	}
+}
+
 func TestUserService_Get(t *testing.T) {
 	setup()
 	defer teardown()
@@ -86,5 +93,21 @@ func TestUserService_Get(t *testing.T) {
 	got, want := user, &User{Name: "TestUser", Bio: "My bio."}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("User.Get user is %v, want %v", got, want)
+	}
+}
+
+func TestUserService_Get_notFound(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/users/TestUser", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testResourceID(t, r, "TestUser")
+		http.Error(w, "not found", http.StatusNotFound)
+	})
+
+	_, err := client.User.Get("TestUser")
+	if err == nil {
+		t.Errorf("Expected HTTP 404 error.")
 	}
 }
