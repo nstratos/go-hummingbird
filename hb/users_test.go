@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"reflect"
 	"testing"
 )
 
@@ -65,5 +66,25 @@ func TestUserService_Authenticate_unauthorized(t *testing.T) {
 	_, err := client.User.Authenticate()
 	if err == nil {
 		t.Errorf("User.Authenticate with invalid username must return err")
+	}
+}
+
+func TestUserService_Get(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/users/TestUser", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testResourceID(t, r, "TestUser")
+		fmt.Fprintf(w, `{"name":"TestUser","bio":"My bio."}`)
+	})
+
+	user, err := client.User.Get("TestUser")
+	if err != nil {
+		t.Errorf("User.Get returned error %v", err)
+	}
+	got, want := user, &User{Name: "TestUser", Bio: "My bio."}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("User.Get user is %v, want %v", got, want)
 	}
 }

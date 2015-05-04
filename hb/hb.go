@@ -15,6 +15,7 @@ type auth struct {
 	Password string `json:"password"`
 }
 
+// Client manages communication with the Hummingbird API.
 type Client struct {
 	client *http.Client
 
@@ -23,8 +24,9 @@ type Client struct {
 	User *UserService
 }
 
+// NewClient returns a new Hummingbird API client.
 func NewClient(httpClient *http.Client) *Client {
-	if client == nil {
+	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
 	baseURL, _ := url.Parse(defaultBaseURL)

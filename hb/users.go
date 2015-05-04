@@ -10,39 +10,40 @@ import (
 	"time"
 )
 
-// User response looks like this
-// {
-//   "name": "erengy",
-//   "waifu": "Taiga Aisaka",
-//   "waifu_or_husbando": "Waifu",
-//   "waifu_slug": "toradora",
-//   "waifu_char_id": "25930",
-//   "location": "",
-//   "website": "http://erengy.com",
-//   "avatar": "http://static.hummingbird.me/users/avatars/000/002/516/thumb/hb-avatar.jpg?1393289118",
-//   "cover_image": "http://static.hummingbird.me/users/cover_images/000/002/516/thumb/hummingbird_cover.jpg?1392287635",
-//   "about": null,
-//   "bio": "Hi.",
-//   "karma": 0,
-//   "life_spent_on_anime": 114520,
-//   "show_adult_content": true,
-//   "title_language_preference": "canonical",
-//   "last_library_update": "2014-06-21T19:28:00.443Z",
-//   "online": false,
-//   "following": false,
-//   "favorites": [ *omitted* ]
-// }
+// User represents a Hummingbird user.
+// Response looks like:
+//   {
+//     "name": "erengy",
+//     "waifu": "Taiga Aisaka",
+//     "waifu_or_husbando": "Waifu",
+//     "waifu_slug": "toradora",
+//     "waifu_char_id": "25930",
+//     "location": "",
+//     "website": "http://erengy.com",
+//     "avatar": "http://static.hummingbird.me/users/avatars/000/002/516/thumb/hb-avatar.jpg?1393289118",
+//     "cover_image": "http://static.hummingbird.me/users/cover_images/000/002/516/thumb/hummingbird_cover.jpg?1392287635",
+//     "about": null,
+//     "bio": "Hi.",
+//     "karma": 0,
+//     "life_spent_on_anime": 114520,
+//     "show_adult_content": true,
+//     "title_language_preference": "canonical",
+//     "last_library_update": "2014-06-21T19:28:00.443Z",
+//     "online": false,
+//     "following": false,
+//     "favorites": [ *omitted* ]
+//   }
 type User struct {
 	Name                    string     `json:"name"`
 	Waifu                   string     `json:"waifu"`
 	WaifuOrHusbando         string     `json:"waifu_or_husbando"`
 	WaifuSlug               string     `json:"waifu_slug"`
-	WaifuCharID             int        `json:"waifu_char_id"`
+	WaifuCharID             string     `json:"waifu_char_id"`
 	Location                string     `json:"location"`
 	Website                 string     `json:"website"`
 	Avatar                  string     `json:"website"`
 	CoverImage              string     `json:"cover_image"`
-	About                   About      `json:"about"`
+	About                   string     `json:"about"`
 	Bio                     string     `json:"bio"`
 	Karma                   int        `json:"karma"`
 	LifeSpentOnAnime        int        `json:"life_spent_on_anime"`
@@ -54,19 +55,17 @@ type User struct {
 	Favorites               []Favorite `json:"favorites"`
 }
 
-type About struct {
-}
-
-// Favorite response looks like this:
-// {
-//   "id": 87118,
-//   "user_id": 2516,
-//   "item_id": 3936,
-//   "item_type": "Anime",
-//   "created_at": "2014-04-25T11:50:34.831Z",
-//   "updated_at": "2014-04-25T11:50:34.831Z",
-//   "fav_rank": 9999
-// }
+// Favorite represents a favorite item of a Hummingbird user.
+// Response looks like:
+//   {
+//     "id": 87118,
+//     "user_id": 2516,
+//     "item_id": 3936,
+//     "item_type": "Anime",
+//     "created_at": "2014-04-25T11:50:34.831Z",
+//     "updated_at": "2014-04-25T11:50:34.831Z",
+//     "fav_rank": 9999
+//   }
 type Favorite struct {
 	ID        int       `json:"id"`
 	UserID    int       `json:"user_id"`
@@ -77,6 +76,11 @@ type Favorite struct {
 	FavRank   int       `json:"fav_rank"`
 }
 
+// UserService handles communication with the user methods of
+// the Hummingbird API.
+//
+// Hummingbird API docs:
+// https://github.com/hummingbird-me/hummingbird/wiki/API-v1-Methods#user
 type UserService struct {
 	client *Client
 	auth   *auth
@@ -125,4 +129,28 @@ func (s *UserService) Authenticate() (string, error) {
 		return "", fmt.Errorf("cannot unmarshal token: %v", err)
 	}
 	return token, nil
+}
+
+// Get information about a user. Does not require authentication.
+func (s *UserService) Get(username string) (*User, error) {
+	endpoint, _ := url.Parse(fmt.Sprintf("users/%s", username))
+	u := s.client.BaseURL.ResolveReference(endpoint)
+
+	resp, err := http.Get(u.String())
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("cannot read body")
+	}
+	defer resp.Body.Close()
+
+	user := new(User)
+	err = json.Unmarshal(body, user)
+	if err != nil {
+		return nil, fmt.Errorf("received: %v, cannot unmarshal user: %v", string(body), err)
+	}
+	return user, nil
 }
