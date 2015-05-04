@@ -133,24 +133,17 @@ func (s *UserService) Authenticate() (string, error) {
 
 // Get information about a user. Does not require authentication.
 func (s *UserService) Get(username string) (*User, error) {
-	endpoint, _ := url.Parse(fmt.Sprintf("api/v1/users/%s", username))
-	u := s.client.BaseURL.ResolveReference(endpoint)
+	urlStr := fmt.Sprintf("api/v1/users/%s", username)
 
-	resp, err := http.Get(u.String())
+	req, err := s.client.NewRequest("GET", urlStr, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("cannot read body")
-	}
-	defer resp.Body.Close()
-
 	user := new(User)
-	err = json.Unmarshal(body, user)
+	_, err = s.client.Do(req, user)
 	if err != nil {
-		return nil, fmt.Errorf("received: %v, cannot unmarshal user: %v", string(body), err)
+		return nil, err
 	}
 	return user, nil
 }
