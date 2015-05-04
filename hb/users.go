@@ -1,11 +1,7 @@
 package hb
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 	"time"
 )
@@ -95,45 +91,29 @@ func (s *UserService) SetCredentials(username, email, password string) {
 // Authenticate a user and return an authentication token if successful. That
 // authentication token can be used in other methods that require authentication.
 func (s *UserService) Authenticate() (string, error) {
-	const urlStr = "api/v1/users/authenticate"
-	endpoint, _ := url.Parse(urlStr)
-	u := s.client.BaseURL.ResolveReference(endpoint)
-
 	if s.auth == nil {
 		return "", fmt.Errorf("credentials are not set")
 	}
-	b, err := json.Marshal(s.auth)
-	if err != nil {
-		return "", fmt.Errorf("cannot marshal auth: %v", err)
-	}
-	resp, err := http.Post(u.String(), "application/json", bytes.NewReader(b))
+
+	const urlStr = "api/v1/users/authenticate"
+
+	req, err := s.client.NewRequest("POST", urlStr, s.auth)
 	if err != nil {
 		return "", err
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("cannot read body")
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode == http.StatusUnauthorized {
-		return "", fmt.Errorf("unauthorized")
-	}
-	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return "", fmt.Errorf("%v %v: %v", resp.Request.Method, resp.Request.URL, resp.StatusCode)
-	}
 	var token string
-	err = json.Unmarshal(body, &token)
+	_, err = s.client.Do(req, &token)
 	if err != nil {
-		return "", fmt.Errorf("cannot unmarshal token: %v", err)
+		return "", err
 	}
+
 	return token, nil
 }
 
 // Get information about a user. Does not require authentication.
 func (s *UserService) Get(username string) (*User, error) {
-	urlStr := fmt.Sprintf("api/v1/users/%s", username)
+	urlStr := fmt.Sprintf("api/v1/users/%s", url.QueryEscape(username))
 
 	req, err := s.client.NewRequest("GET", urlStr, nil)
 	if err != nil {

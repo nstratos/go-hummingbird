@@ -64,7 +64,14 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 		}
 	}
 
-	return http.NewRequest(method, u.String(), buf)
+	req, err := http.NewRequest(method, u.String(), buf)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+
+	return req, nil
 }
 
 // Do sends an API request and returns the API response. If an API error has
