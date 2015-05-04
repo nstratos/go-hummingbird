@@ -2,7 +2,6 @@ package hb
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -66,21 +65,5 @@ func TestUserService_Authenticate_unauthorized(t *testing.T) {
 	_, err := client.User.Authenticate()
 	if err == nil {
 		t.Errorf("User.Authenticate with invalid username must return err")
-	}
-}
-
-func testMethod(t *testing.T, r *http.Request, want string) {
-	if got := r.Method; got != want {
-		t.Errorf("Request method: %v, want %v", want)
-	}
-}
-
-func testBody(t *testing.T, r *http.Request, want string) {
-	b, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		t.Errorf("Error reading request body: %v", err)
-	}
-	if got := string(b); got != want {
-		t.Errorf("Request body is %v, want %v", got, want)
 	}
 }
