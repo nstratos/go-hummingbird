@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	defaultBaseURL = "http://hummingbird.me/"
+	defaultBaseURL = "https://hummingbird.me/"
 )
 
 type auth struct {
