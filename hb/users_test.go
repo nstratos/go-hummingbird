@@ -90,6 +90,7 @@ func TestUserService_Get(t *testing.T) {
 	if err != nil {
 		t.Errorf("User.Get returned error %v", err)
 	}
+
 	got, want := user, &User{Name: "TestUser", Bio: "My bio."}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("User.Get user is %v, want %v", got, want)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"reflect"
 	"strings"
 	"testing"
@@ -29,6 +30,20 @@ func testResourceID(t *testing.T, r *http.Request, want string) {
 	id := r.URL.Path[strings.LastIndex(r.URL.Path, "/")+1:]
 	if got := id; got != want {
 		t.Errorf("%v ID is %v, want %v", r.URL.Path, id, want)
+	}
+}
+
+type values map[string]string
+
+func testFormValues(t *testing.T, r *http.Request, values values) {
+	want := url.Values{}
+	for k, v := range values {
+		want.Add(k, v)
+	}
+
+	r.ParseForm()
+	if got := r.Form; !reflect.DeepEqual(got, want) {
+		t.Errorf("Request parameters: %v, want %v", got, want)
 	}
 }
 

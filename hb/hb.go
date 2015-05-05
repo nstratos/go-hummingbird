@@ -26,7 +26,8 @@ type Client struct {
 
 	BaseURL *url.URL
 
-	User *UserService
+	User  *UserService
+	Anime *AnimeService
 }
 
 // NewClient returns a new Hummingbird API client.
@@ -39,6 +40,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c := &Client{client: httpClient, BaseURL: baseURL}
 
 	c.User = &UserService{client: c}
+	c.Anime = &AnimeService{client: c}
 	return c
 }
 
@@ -113,6 +115,7 @@ func checkResponse(r *http.Response) error {
 	return errorResponse
 }
 
+// ErrorResponse represents a Hummingbird API error response.
 type ErrorResponse struct {
 	Response *http.Response
 	Message  string `json:"error"`
