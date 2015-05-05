@@ -91,3 +91,27 @@ func (s *AnimeService) Get(animeID, titleLangPref string) (*Anime, error) {
 	}
 	return anime, nil
 }
+
+// Search allows searching anime by title. It returns an array of anime objects
+// (5 max) without genres. It supports fuzzy search.
+//
+// Does not require authentication.
+func (s *AnimeService) Search(query string) ([]Anime, error) {
+	const urlStr = "api/v1/search/anime"
+
+	req, err := s.client.NewRequest("GET", urlStr, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	v := req.URL.Query()
+	v.Set("query", query)
+	req.URL.RawQuery = v.Encode()
+
+	var anime []Anime
+	_, err = s.client.Do(req, &anime)
+	if err != nil {
+		return nil, err
+	}
+	return anime, nil
+}
