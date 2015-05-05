@@ -74,6 +74,16 @@ func TestClient_NewRequest(t *testing.T) {
 	}
 }
 
+func TestClient_NewRequest_jsonEncodeError(t *testing.T) {
+	c := NewClient(nil)
+	in := func() {} // func cannot be encoded to JSON
+
+	_, err := c.NewRequest("GET", "/foo", in)
+	if err == nil {
+		t.Error("Expected JSON encode error.")
+	}
+}
+
 func TestClient_Do(t *testing.T) {
 	setup()
 	defer teardown()
@@ -102,12 +112,23 @@ func TestClient_Do_httpError(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		http.Error(w, `{"error":"Bad Request"}`, http.StatusBadRequest)
 	})
 
 	req, _ := client.NewRequest("GET", "/", nil)
 	_, err := client.Do(req, nil)
 	if err == nil {
 		t.Error("Expected HTTP 400 error.")
+	}
+	if got, want := err.Error(), fmt.Sprintf("GET %v/: 400 Bad Request", server.URL); got != want {
+		t.Errorf("ErrorResponse is %v, want %v", got, want)
+	}
+}
+
+func TestClient_Do_connectionRefused(t *testing.T) {
+	req, _ := client.NewRequest("GET", "/", nil)
+	_, err := client.Do(req, nil)
+	if err == nil {
+		t.Error("Expected connection refused error.")
 	}
 }

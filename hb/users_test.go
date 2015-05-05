@@ -70,7 +70,8 @@ func TestUserService_Authenticate_unauthorized(t *testing.T) {
 }
 
 func TestUserService_Authenticate_credentialsNotSet(t *testing.T) {
-	_, err := client.User.Authenticate()
+	c := NewClient(nil)
+	_, err := c.User.Authenticate()
 	if err == nil {
 		t.Errorf("Expected credentials not set error.")
 	}
