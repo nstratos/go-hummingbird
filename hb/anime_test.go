@@ -46,6 +46,16 @@ func TestAnimeService_Get_notFound(t *testing.T) {
 	}
 }
 
+func TestAnimeService_Get_badURL(t *testing.T) {
+	c := NewClient(nil)
+	urlStr := "%foo"
+
+	_, err := c.Anime.Get(urlStr, "")
+	if err == nil {
+		t.Error("Expected invalid URL escape error.")
+	}
+}
+
 func TestAnimeService_Search(t *testing.T) {
 	setup()
 	defer teardown()

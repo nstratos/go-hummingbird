@@ -114,6 +114,16 @@ func TestUserService_Get_notFound(t *testing.T) {
 	}
 }
 
+func TestUserService_Get_badURL(t *testing.T) {
+	c := NewClient(nil)
+	urlStr := "%foo"
+
+	_, err := c.User.Get(urlStr)
+	if err == nil {
+		t.Error("Expected invalid URL escape error.")
+	}
+}
+
 func TestUserService_Feed(t *testing.T) {
 	setup()
 	defer teardown()
@@ -151,6 +161,16 @@ func TestUserService_Feed_notFound(t *testing.T) {
 	}
 }
 
+func TestUserService_Feed_badURL(t *testing.T) {
+	c := NewClient(nil)
+	urlStr := "%foo"
+
+	_, err := c.User.Feed(urlStr)
+	if err == nil {
+		t.Error("Expected invalid URL escape error.")
+	}
+}
+
 func TestUserService_FavoriteAnime(t *testing.T) {
 	setup()
 	defer teardown()
@@ -185,5 +205,15 @@ func TestUserService_FavoriteAnime_notFound(t *testing.T) {
 	_, err := client.User.FavoriteAnime("InvalidUser")
 	if err == nil {
 		t.Error("Expected HTTP 404 error.")
+	}
+}
+
+func TestUserService_FavoriteAnime_badURL(t *testing.T) {
+	c := NewClient(nil)
+	urlStr := "%foo"
+
+	_, err := c.User.FavoriteAnime(urlStr)
+	if err == nil {
+		t.Error("Expected invalid URL escape error.")
 	}
 }

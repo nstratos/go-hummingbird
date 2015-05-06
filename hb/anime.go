@@ -1,9 +1,6 @@
 package hb
 
-import (
-	"fmt"
-	"net/url"
-)
+import "fmt"
 
 // Anime represents a hummingbird anime object.
 // An anime response looks like:
@@ -73,7 +70,7 @@ type AnimeService struct {
 //
 // Does not require authentication.
 func (s *AnimeService) Get(animeID, titleLangPref string) (*Anime, error) {
-	urlStr := fmt.Sprintf("api/v1/anime/%s", url.QueryEscape(animeID))
+	urlStr := fmt.Sprintf("api/v1/anime/%s", animeID)
 
 	req, err := s.client.NewRequest("GET", urlStr, nil)
 	if err != nil {

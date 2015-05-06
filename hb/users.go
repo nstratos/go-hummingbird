@@ -2,7 +2,6 @@ package hb
 
 import (
 	"fmt"
-	"net/url"
 	"time"
 )
 
@@ -130,7 +129,7 @@ func (s *UserService) Authenticate() (string, error) {
 
 // Get information about a user. Does not require authentication.
 func (s *UserService) Get(username string) (*User, error) {
-	urlStr := fmt.Sprintf("api/v1/users/%s", url.QueryEscape(username))
+	urlStr := fmt.Sprintf("api/v1/users/%s", username)
 
 	req, err := s.client.NewRequest("GET", urlStr, nil)
 	if err != nil {
