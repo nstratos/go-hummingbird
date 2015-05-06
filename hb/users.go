@@ -203,3 +203,23 @@ func (s *UserService) Feed(username string) ([]Story, error) {
 	}
 	return stories, nil
 }
+
+// FavoriteAnime returns the user's favorite anime in
+// an array of Anime objects.
+//
+// Does not require authentication.
+func (s *UserService) FavoriteAnime(username string) ([]Anime, error) {
+	urlStr := fmt.Sprintf("api/v1/users/%s/favorite_anime", username)
+
+	req, err := s.client.NewRequest("GET", urlStr, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var anime []Anime
+	_, err = s.client.Do(req, &anime)
+	if err != nil {
+		return nil, err
+	}
+	return anime, nil
+}

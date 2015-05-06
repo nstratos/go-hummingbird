@@ -150,3 +150,40 @@ func TestUserService_Feed_notFound(t *testing.T) {
 		t.Error("Expected HTTP 404 error.")
 	}
 }
+
+func TestUserService_FavoriteAnime(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/users/TestUser/favorite_anime", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testResourceParts(t, r, []string{"TestUser", "favorite_anime"})
+		fmt.Fprintf(w, `[{"title":"Log Horizon"},{"title":"Nichijou"}]`)
+	})
+
+	anime, err := client.User.FavoriteAnime("TestUser")
+	if err != nil {
+		t.Errorf("User.FavoriteAnime returned error %v", err)
+	}
+
+	got, want := anime, []Anime{{Title: "Log Horizon"}, {Title: "Nichijou"}}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("User.FavoriteAnime anime are %v, want %v", got, want)
+	}
+}
+
+func TestUserService_FavoriteAnime_notFound(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/users/InvalidUser/favorite_anime", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testResourceParts(t, r, []string{"InvalidUser", "favorite_anime"})
+		http.Error(w, "not found", http.StatusNotFound)
+	})
+
+	_, err := client.User.FavoriteAnime("InvalidUser")
+	if err == nil {
+		t.Error("Expected HTTP 404 error.")
+	}
+}

@@ -48,6 +48,8 @@ type Anime struct {
 	CommunityRating float64 `json:"community_rating,omitempty"`
 	AgeRating       string  `json:"age_rating,omitempty"`
 	Genres          []Genre `json:"genres,omitempty"`
+	FavID           int     `json:"fav_id,omitempty"`   // When requesting user favorite anime.
+	FavRank         int     `json:"fav_rank,omitempty"` // When requesting user favorite anime.
 }
 
 // Genre represents the genre of an anime.
