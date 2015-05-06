@@ -110,6 +110,43 @@ func TestUserService_Get_notFound(t *testing.T) {
 
 	_, err := client.User.Get("TestUser")
 	if err == nil {
-		t.Errorf("Expected HTTP 404 error.")
+		t.Error("Expected HTTP 404 error.")
+	}
+}
+
+func TestUserService_Feed(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/users/TestUser/feed", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testResourceParts(t, r, []string{"TestUser", "feed"})
+		fmt.Fprintf(w, `[{"id":1,"story_type":"comment"},{"id":2,"story_type":"media_story"}]`)
+	})
+
+	stories, err := client.User.Feed("TestUser")
+	if err != nil {
+		t.Errorf("User.Feed returned error %v", err)
+	}
+
+	got, want := stories, []Story{{ID: 1, StoryType: "comment"}, {ID: 2, StoryType: "media_story"}}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("User.Feed stories are %v, want %v", got, want)
+	}
+}
+
+func TestUserService_Feed_notFound(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/users/InvalidUser/feed", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testResourceParts(t, r, []string{"InvalidUser", "feed"})
+		http.Error(w, "not found", http.StatusNotFound)
+	})
+
+	_, err := client.User.Feed("TestUser")
+	if err == nil {
+		t.Error("Expected HTTP 404 error.")
 	}
 }

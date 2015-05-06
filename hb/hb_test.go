@@ -33,6 +33,17 @@ func testResourceID(t *testing.T, r *http.Request, want string) {
 	}
 }
 
+func testResourceParts(t *testing.T, r *http.Request, parts []string) {
+	p := strings.Split(r.URL.Path, "/")
+	if len(parts) <= len(p) {
+		p = p[len(p)-len(parts):]
+	}
+
+	if got, want := p, parts; !reflect.DeepEqual(got, want) {
+		t.Errorf("%v ends in %+v, want %v", r.URL.Path, got, want)
+	}
+}
+
 type values map[string]string
 
 func testFormValues(t *testing.T, r *http.Request, values values) {

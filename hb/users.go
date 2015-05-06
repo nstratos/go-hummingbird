@@ -51,6 +51,23 @@ type User struct {
 	Favorites               []Favorite `json:"favorites,omitempty"`
 }
 
+// UserMini represents a Hummingbird user with minimum info.
+// Response looks like:
+//   {
+//     "name": "erengy",
+//     "url": "http://hummingbird.me/users/erengy",
+//     "avatar": "http://static.hummingbird.me/users/avatars/000/002/516/thumb/hb-avatar.jpg?1393289118",
+//     "avatar_small": "http://static.hummingbird.me/users/avatars/000/002/516/thumb_small/hb-avatar.jpg?1393289118",
+//     "nb": false
+//   }
+type UserMini struct {
+	Name        string `json:"name,omitempty"`
+	URL         string `json:"url,omitempty"`
+	Avatar      string `json:"avatar,omitempty"`
+	AvatarSmall string `json:"avatar_small,omitempty"`
+	NB          bool   `json:"nb,omitempty"`
+}
+
 // Favorite represents a favorite item of a Hummingbird user.
 // Response looks like:
 //   {
@@ -126,4 +143,63 @@ func (s *UserService) Get(username string) (*User, error) {
 		return nil, err
 	}
 	return user, nil
+}
+
+// Story represents a Hummingbird Story object such as user's activity feed.
+// Response looks like:
+//   {
+//     "id": 2640597,
+//     "story_type": "comment",
+//     "user": { *omitted* },
+//     "updated_at": "2014-06-21T10:37:36.730Z",
+//     "self_post": false,
+//     "poster": { *omitted* },
+//     "substories_count": 1,
+//     "substories": [ *omitted* ]
+//   }
+type Story struct {
+	ID              int        `json:"id"`
+	StoryType       string     `json:"story_type"`
+	User            *UserMini  `json:"user"`
+	UpdatedAt       *time.Time `json:"updated_at"`
+	SelfPost        bool       `json:"self_post"`
+	Poster          *UserMini  `json:"poster"`
+	SubstoriesCount int        `json:"substories_count"`
+	Substories      []Substory `json:"substories"`
+}
+
+// Substory represents a Hummingbird Substory object.
+// Response looks like:
+//   {
+//     "id": 6590163,
+//     "substory_type": "watched_episode",
+//     "created_at": "2014-06-23T21:25:49.084Z",
+//     "episode_number": "12",
+//     "service": null,  // should be ignored
+//     "permissions": {} // should be ignored
+//   }
+type Substory struct {
+	ID            int        `json:"id"`
+	SubstoryType  string     `json:"substory_type"`
+	CreatedAt     *time.Time `json:"created_at"`
+	EpisodeNumber string     `json:"episode_number"`
+}
+
+// Feed returns a user's activity feed.
+//
+// Does not require authentication.
+func (s *UserService) Feed(username string) ([]Story, error) {
+	urlStr := fmt.Sprintf("api/v1/users/%s/feed", username)
+
+	req, err := s.client.NewRequest("GET", urlStr, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var stories []Story
+	_, err = s.client.Do(req, &stories)
+	if err != nil {
+		return nil, err
+	}
+	return stories, nil
 }
