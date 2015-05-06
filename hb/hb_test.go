@@ -85,6 +85,16 @@ func TestClient_NewRequest(t *testing.T) {
 	}
 }
 
+func TestClient_NewRequest_badURL(t *testing.T) {
+	c := NewClient(nil)
+	urlStr := "%foo"
+
+	_, err := c.NewRequest("GET", urlStr, nil)
+	if err == nil {
+		t.Error("Expected invalid URL escape error.")
+	}
+}
+
 func TestClient_NewRequest_jsonEncodeError(t *testing.T) {
 	c := NewClient(nil)
 	in := func() {} // func cannot be encoded to JSON
