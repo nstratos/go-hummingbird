@@ -52,7 +52,7 @@ type LibraryEntryRating struct {
 	Value string `json:"value"`
 }
 
-// LibraryServices handles communication with the Hummingbird API library
+// LibraryService handles communication with the Hummingbird API library
 // methods (GET /users/{username}/library} is handled by UserService).
 //
 // Hummingbird API docs:
@@ -171,4 +171,29 @@ func (s *LibraryService) Update(animeID, authToken string, entry *Entry) (*Libra
 		return nil, err
 	}
 	return libraryEntry, nil
+}
+
+// Remove removes an entry from the user's library.
+//
+// The animeID can be an ID like "7622" or a slug like "log-horizon".
+//
+// To acquire a user's authentication token:
+//   c := hb.NewClient(nil)
+//   token, err := c.User.Authenticate("USER_HUMMINGBIRD_USERNAME", "", "USER_HUMMINGBIRD_PASSWORD")
+//   // handle err
+func (s *LibraryService) Remove(animeID, authToken string) (bool, error) {
+	urlStr := fmt.Sprintf("api/v1/libraries/%v/remove", animeID)
+
+	entry := &Entry{ID: animeID, AuthToken: authToken}
+	req, err := s.client.NewRequest("POST", urlStr, entry)
+	if err != nil {
+		return false, err
+	}
+
+	removed := false
+	_, err = s.client.Do(req, &removed)
+	if err != nil {
+		return false, err
+	}
+	return removed, nil
 }

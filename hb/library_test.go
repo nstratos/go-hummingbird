@@ -64,3 +64,62 @@ func TestLibraryService_Update_badAnimeID(t *testing.T) {
 		t.Error("Expected invalid URL escape error.")
 	}
 }
+
+func TestLibraryService_Remove(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/libraries/", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		testResourceParts(t, r, []string{"log-horizon", "remove"})
+		requestBody := `{"id":"log-horizon","auth_token":"valid_user_token"}`
+		testBody(t, r, requestBody+"\n")
+		fmt.Fprintf(w, `true`)
+	})
+
+	removed, err := client.Library.Remove("log-horizon", "valid_user_token")
+	if err != nil {
+		t.Errorf("Library.Remove returned error %v", err)
+	}
+
+	if got, want := removed, true; got != want {
+		t.Errorf("Library.Remove returned %v, want %v", got, want)
+	}
+}
+
+func TestLibraryService_invalidToken(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/libraries/", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		testResourceParts(t, r, []string{"log-horizon", "remove"})
+		requestBody := `{"id":"log-horizon","auth_token":"invalid_user_token"}`
+		testBody(t, r, requestBody+"\n")
+		http.Error(w, `{"error": "Invalid authentication token"}`, http.StatusUnauthorized)
+	})
+
+	removed, err := client.Library.Remove("log-horizon", "invalid_user_token")
+	if err == nil {
+		t.Error("Expected HTTP 401 error.")
+	}
+
+	if got, want := removed, false; got != want {
+		t.Errorf("Library.Remove returned %v, want %v", got, want)
+	}
+
+	want := fmt.Sprintf("POST %v/api/v1/libraries/log-horizon/remove: 401 Invalid authentication token", server.URL)
+	if got := err.Error(); got != want {
+		t.Errorf("ErrorResponse is %v, want %v", got, want)
+	}
+}
+
+func TestLibraryService_Remove_badAnimeID(t *testing.T) {
+	c := NewClient(nil)
+	animeID := "%foo"
+
+	_, err := c.Library.Remove(animeID, "")
+	if err == nil {
+		t.Error("Expected invalid URL escape error.")
+	}
+}
