@@ -23,20 +23,15 @@ const (
 	defaultBaseURL = "https://hummingbird.me/"
 )
 
-type auth struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 // Client manages communication with the Hummingbird API.
 type Client struct {
 	client *http.Client
 
 	BaseURL *url.URL
 
-	User  *UserService
-	Anime *AnimeService
+	User    *UserService
+	Anime   *AnimeService
+	Library *LibraryService
 }
 
 // NewClient returns a new Hummingbird API client.
@@ -50,6 +45,7 @@ func NewClient(httpClient *http.Client) *Client {
 
 	c.User = &UserService{client: c}
 	c.Anime = &AnimeService{client: c}
+	c.Library = &LibraryService{client: c}
 	return c
 }
 

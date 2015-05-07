@@ -98,10 +98,17 @@ type UserService struct {
 	auth   *auth
 }
 
+type auth struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	token    string
+}
+
 // SetCredentials sets the username, email and password for the methods that
 // require authentication. From username and email only one is needed.
 func (s *UserService) SetCredentials(username, email, password string) {
-	s.auth = &auth{username, email, password}
+	s.auth = &auth{Username: username, Email: email, Password: password}
 }
 
 // Authenticate a user and return an authentication token if successful. That
@@ -123,6 +130,7 @@ func (s *UserService) Authenticate() (string, error) {
 	if err != nil {
 		return "", err
 	}
+	s.auth.token = token
 
 	return token, nil
 }
