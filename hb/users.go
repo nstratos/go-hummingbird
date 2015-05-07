@@ -222,3 +222,27 @@ func (s *UserService) FavoriteAnime(username string) ([]Anime, error) {
 	}
 	return anime, nil
 }
+
+// Library returns an array of library entry objects, without genres,
+// representing a user's anime library entries.
+//
+// Does not require authentication.
+func (s *UserService) Library(username, status string) ([]LibraryEntry, error) {
+	urlStr := fmt.Sprintf("api/v1/users/%s/library", username)
+
+	req, err := s.client.NewRequest("GET", urlStr, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	v := req.URL.Query()
+	v.Set("status", status)
+	req.URL.RawQuery = v.Encode()
+
+	var entries []LibraryEntry
+	_, err = s.client.Do(req, &entries)
+	if err != nil {
+		return nil, err
+	}
+	return entries, nil
+}

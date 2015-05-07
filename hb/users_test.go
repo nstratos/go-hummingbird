@@ -114,11 +114,11 @@ func TestUserService_Get_notFound(t *testing.T) {
 	}
 }
 
-func TestUserService_Get_badURL(t *testing.T) {
+func TestUserService_Get_badUsername(t *testing.T) {
 	c := NewClient(nil)
-	urlStr := "%foo"
+	username := "%foo"
 
-	_, err := c.User.Get(urlStr)
+	_, err := c.User.Get(username)
 	if err == nil {
 		t.Error("Expected invalid URL escape error.")
 	}
@@ -161,11 +161,11 @@ func TestUserService_Feed_notFound(t *testing.T) {
 	}
 }
 
-func TestUserService_Feed_badURL(t *testing.T) {
+func TestUserService_Feed_badUsername(t *testing.T) {
 	c := NewClient(nil)
-	urlStr := "%foo"
+	username := "%foo"
 
-	_, err := c.User.Feed(urlStr)
+	_, err := c.User.Feed(username)
 	if err == nil {
 		t.Error("Expected invalid URL escape error.")
 	}
@@ -208,11 +208,76 @@ func TestUserService_FavoriteAnime_notFound(t *testing.T) {
 	}
 }
 
-func TestUserService_FavoriteAnime_badURL(t *testing.T) {
+func TestUserService_FavoriteAnime_badUsername(t *testing.T) {
 	c := NewClient(nil)
-	urlStr := "%foo"
+	username := "%foo"
 
-	_, err := c.User.FavoriteAnime(urlStr)
+	_, err := c.User.FavoriteAnime(username)
+	if err == nil {
+		t.Error("Expected invalid URL escape error.")
+	}
+}
+
+func TestUserService_Library(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/users/TestUser/library", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testFormValues(t, r, values{"status": "currently-watching"})
+		testResourceParts(t, r, []string{"TestUser", "library"})
+		fmt.Fprintf(w, `
+			[
+			  { "id":22, "status":"currently-watching", 
+			    "rating":{"type":"advanced", "value":"4.0"} 
+			  },
+			  { "id":23, "status":"currently-watching", 
+			    "anime":{"title":"Log Horizon"} 
+			  }
+			]
+			`)
+	})
+
+	entries, err := client.User.Library("TestUser", "currently-watching")
+	if err != nil {
+		t.Errorf("User.Library returned error %v", err)
+	}
+
+	got, want := entries, []LibraryEntry{
+		{ID: 22, Status: StatusCurrentlyWatching,
+			Rating: &LibraryEntryRating{Type: "advanced", Value: "4.0"},
+		},
+		{ID: 23, Status: StatusCurrentlyWatching,
+			Anime: &Anime{Title: "Log Horizon"},
+		},
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("User.Library entries are %v, want %v", got, want)
+	}
+}
+
+func TestUserService_Library_notFound(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/users/InvalidTestUser/library", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testFormValues(t, r, values{"status": "currently-watching"})
+		testResourceParts(t, r, []string{"InvalidTestUser", "library"})
+		http.Error(w, "not found", http.StatusNotFound)
+	})
+
+	_, err := client.User.Library("InvalidTestUser", "currently-watching")
+	if err == nil {
+		t.Error("Expected HTTP 404 error.")
+	}
+}
+
+func TestUserService_Library_badUsername(t *testing.T) {
+	c := NewClient(nil)
+	username := "%foo"
+
+	_, err := c.User.Library(username, "")
 	if err == nil {
 		t.Error("Expected invalid URL escape error.")
 	}

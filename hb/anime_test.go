@@ -46,11 +46,11 @@ func TestAnimeService_Get_notFound(t *testing.T) {
 	}
 }
 
-func TestAnimeService_Get_badURL(t *testing.T) {
+func TestAnimeService_Get_badAnimeID(t *testing.T) {
 	c := NewClient(nil)
-	urlStr := "%foo"
+	animeID := "%foo"
 
-	_, err := c.Anime.Get(urlStr, "")
+	_, err := c.Anime.Get(animeID, "")
 	if err == nil {
 		t.Error("Expected invalid URL escape error.")
 	}
