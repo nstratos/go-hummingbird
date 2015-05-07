@@ -11,19 +11,17 @@ func TestLibraryService_Update(t *testing.T) {
 	setup()
 	defer teardown()
 
-	client.User.auth = &auth{token: "valid_secret_token"}
-
 	mux.HandleFunc("/api/v1/libraries/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		requestBody := `{"id":"log-horizon","auth_token":"valid_secret_token","episodes_watched":3,"increment_episodes":true}`
+		requestBody := `{"id":"log-horizon","auth_token":"valid_user_token","episodes_watched":3,"increment_episodes":true}`
 		testBody(t, r, requestBody+"\n")
 		testResourceID(t, r, "log-horizon")
 		fmt.Fprintf(w, `{"id":7622,"episodes_watched":4}`)
 	})
 
-	entry := Entry{ID: "log-horizon", EpisodesWatched: 3, IncrementEpisodes: true}
+	entry := &Entry{EpisodesWatched: 3, IncrementEpisodes: true}
 
-	libraryEntry, err := client.Library.Update(entry)
+	libraryEntry, err := client.Library.Update("log-horizon", "valid_user_token", entry)
 	if err != nil {
 		t.Errorf("Library.Update returned error %v", err)
 	}
@@ -40,30 +38,28 @@ func TestLibraryService_Update_invalidToken(t *testing.T) {
 
 	mux.HandleFunc("/api/v1/libraries/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		requestBody := `{"id":"log-horizon","auth_token":""}`
+		requestBody := `{"id":"log-horizon","auth_token":"invalid_user_token"}`
 		testBody(t, r, requestBody+"\n")
 		testResourceID(t, r, "log-horizon")
-		http.Error(w, `{"error": "invalid token"}`, http.StatusUnauthorized)
+		http.Error(w, `{"error": "Invalid authentication token"}`, http.StatusUnauthorized)
 	})
 
-	entry := Entry{ID: "log-horizon"}
-
-	_, err := client.Library.Update(entry)
+	_, err := client.Library.Update("log-horizon", "invalid_user_token", nil)
 	if err == nil {
-		t.Error("Expected HTTP error.")
+		t.Error("Expected HTTP 401 error.")
 	}
 
-	want := fmt.Sprintf("POST %v/api/v1/libraries/log-horizon: 401 invalid token", server.URL)
+	want := fmt.Sprintf("POST %v/api/v1/libraries/log-horizon: 401 Invalid authentication token", server.URL)
 	if got := err.Error(); got != want {
 		t.Errorf("ErrorResponse is %v, want %v", got, want)
 	}
 }
 
-func TestLibraryService_Update_badEntryID(t *testing.T) {
+func TestLibraryService_Update_badAnimeID(t *testing.T) {
 	c := NewClient(nil)
-	entry := Entry{ID: "%foo"}
+	animeID := "%foo"
 
-	_, err := c.Library.Update(entry)
+	_, err := c.Library.Update(animeID, "", nil)
 	if err == nil {
 		t.Error("Expected invalid URL escape error.")
 	}

@@ -95,32 +95,27 @@ type Favorite struct {
 // https://github.com/hummingbird-me/hummingbird/wiki/API-v1-Methods#user
 type UserService struct {
 	client *Client
-	auth   *auth
 }
 
 type auth struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
-	token    string
-}
-
-// SetCredentials sets the username, email and password for the methods that
-// require authentication. From username and email only one is needed.
-func (s *UserService) SetCredentials(username, email, password string) {
-	s.auth = &auth{Username: username, Email: email, Password: password}
 }
 
 // Authenticate a user and return an authentication token if successful. That
-// authentication token can be used in other methods that require authentication.
-func (s *UserService) Authenticate() (string, error) {
-	if s.auth == nil {
-		return "", fmt.Errorf("credentials are not set")
+// token can be used in other methods that require authentication. From
+// username and email only one is needed.
+func (s *UserService) Authenticate(username, email, password string) (string, error) {
+	if username == "" && email == "" {
+		return "", fmt.Errorf("username or email must be provided")
 	}
 
 	const urlStr = "api/v1/users/authenticate"
 
-	req, err := s.client.NewRequest("POST", urlStr, s.auth)
+	auth := auth{Username: username, Email: email, Password: password}
+
+	req, err := s.client.NewRequest("POST", urlStr, auth)
 	if err != nil {
 		return "", err
 	}
@@ -130,12 +125,13 @@ func (s *UserService) Authenticate() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	s.auth.token = token
 
 	return token, nil
 }
 
-// Get information about a user. Does not require authentication.
+// Get information about a user.
+//
+// Does not require authentication.
 func (s *UserService) Get(username string) (*User, error) {
 	urlStr := fmt.Sprintf("api/v1/users/%s", username)
 

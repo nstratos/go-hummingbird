@@ -34,15 +34,13 @@ func TestUserService_Authenticate(t *testing.T) {
 	setup()
 	defer teardown()
 
-	client.User.SetCredentials("TestUser", "", "TestPass")
-
 	mux.HandleFunc("/api/v1/users/authenticate", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 		testBody(t, r, `{"username":"TestUser","email":"","password":"TestPass"}`+"\n")
 		fmt.Fprintf(w, `"token1234"`)
 	})
 
-	token, err := client.User.Authenticate()
+	token, err := client.User.Authenticate("TestUser", "", "TestPass")
 	if err != nil {
 		t.Errorf("User.Authenticate returned error %v", err)
 	}
@@ -55,25 +53,23 @@ func TestUserService_Authenticate_unauthorized(t *testing.T) {
 	setup()
 	defer teardown()
 
-	client.User.SetCredentials("InvalidTestUser", "", "TestPass")
-
 	mux.HandleFunc("/api/v1/users/authenticate", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 		testBody(t, r, `{"username":"InvalidTestUser","email":"","password":"TestPass"}`+"\n")
 		http.Error(w, `{"error":"invalid credentials"}`, http.StatusUnauthorized)
 	})
 
-	_, err := client.User.Authenticate()
+	_, err := client.User.Authenticate("InvalidTestUser", "", "TestPass")
 	if err == nil {
-		t.Errorf("User.Authenticate with invalid username must return err")
+		t.Error("Expected HTTP 401 error.")
 	}
 }
 
 func TestUserService_Authenticate_credentialsNotSet(t *testing.T) {
 	c := NewClient(nil)
-	_, err := c.User.Authenticate()
+	_, err := c.User.Authenticate("", "", "")
 	if err == nil {
-		t.Errorf("Expected credentials not set error.")
+		t.Errorf("Expected username or email must be provided error.")
 	}
 }
 

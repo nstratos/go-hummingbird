@@ -65,17 +65,13 @@ type LibraryService struct {
 //
 // ID - Required
 //
-// Can be an anime ID like "7622" or a slug like "log-horizon".
+// Can be an anime ID like "7622" or a slug like "log-horizon". It is set
+// automatically from the method that uses Entry.
 //
 // AuthToken - Required
 //
-// A valid user authentication token. One way to acquire a token is:
-//   c := hb.NewClient(nil)
-//   c.SetCredentials("YOUR_HUMMINGBIRD_USERNAME", "", "YOUR_HUMMINGBIRD_PASSWORD")
-//   token, err := c.User.Authenticate()
-//   // handle err
-// Note that c.User.Authenticate(), if successful, keeps the token in memory.
-// That token will be used automatically, if the Entry.AuthToken value is empty.
+// A valid user authentication token. It is set automatically from the method
+// that uses Entry.
 //
 // Status - Optional
 //
@@ -143,22 +139,26 @@ type Entry struct {
 	IncrementEpisodes bool   `json:"increment_episodes,omitempty"`
 }
 
-// Update adds or updates a user's library entry. The updated Library entry is
-// returned on success.
+// Update adds or updates a user's library entry. The updated library entry is
+// returned on success. Requires authentication.
 //
-// It assumes that the client already has a valid auth token by a previous
-// successful authentication. Alternatively an auth token can be directly
-// passed in the entry values.
+// The animeID can be an ID like "7622" or a slug like "log-horizon".
 //
-// Requires authentication.
-func (s *LibraryService) Update(entry Entry) (*LibraryEntry, error) {
-	urlStr := fmt.Sprintf("api/v1/libraries/%v", entry.ID)
+// To acquire a user's authentication token:
+//   c := hb.NewClient(nil)
+//   token, err := c.User.Authenticate("USER_HUMMINGBIRD_USERNAME", "", "USER_HUMMINGBIRD_PASSWORD")
+//   // handle err
+//
+// An optional entry parameter can be specified with additional values to
+// add/update on a user's library entry.
+func (s *LibraryService) Update(animeID, authToken string, entry *Entry) (*LibraryEntry, error) {
+	urlStr := fmt.Sprintf("api/v1/libraries/%v", animeID)
 
-	if entry.AuthToken == "" {
-		if auth := s.client.User.auth; auth != nil && auth.token != "" {
-			entry.AuthToken = auth.token
-		}
+	if entry == nil {
+		entry = new(Entry)
 	}
+	entry.ID = animeID
+	entry.AuthToken = authToken
 
 	req, err := s.client.NewRequest("POST", urlStr, entry)
 	if err != nil {
@@ -172,18 +172,3 @@ func (s *LibraryService) Update(entry Entry) (*LibraryEntry, error) {
 	}
 	return libraryEntry, nil
 }
-
-// func (c *Client) fetchAuthToken() (string, error) {
-
-// 	if c.User.auth != nil && c.User.auth.token != "" {
-// 		return c.User.auth.token, nil
-// 	}
-
-// 	token, err := c.User.Authenticate()
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	c.User.auth.token = token
-
-// 	return token, nil
-// }
