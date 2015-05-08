@@ -109,7 +109,7 @@ func (s *UserService) Get(username string) (*User, *http.Response, error) {
 	return user, resp, nil
 }
 
-// Story represents a Hummingbird Story object such as user's activity feed.
+// Story represents a Hummingbird Story object such as a user's activity feed.
 type Story struct {
 	ID              int        `json:"id",omitempty`
 	StoryType       string     `json:"story_type,omitempty"`
@@ -117,6 +117,7 @@ type Story struct {
 	UpdatedAt       *time.Time `json:"updated_at,omitempty"`
 	SelfPost        bool       `json:"self_post,omitempty"`
 	Poster          *UserMini  `json:"poster,omitempty"`
+	Media           *Anime     `json:"media,omitempty"`
 	SubstoriesCount int        `json:"substories_count,omitempty"`
 	Substories      []Substory `json:"substories,omitempty"`
 }
@@ -126,7 +127,10 @@ type Substory struct {
 	ID            int        `json:"id,omitempty"`
 	SubstoryType  string     `json:"substory_type,omitempty"`
 	CreatedAt     *time.Time `json:"created_at,omitempty"`
+	Comment       string     `json:"comment,omitempty"`
 	EpisodeNumber string     `json:"episode_number,omitempty"`
+	FollowedUser  *UserMini  `json:"followed_user,omitempty"`
+	NewStatus     string     `json:"new_status,omitempty"`
 }
 
 // Feed returns a user's activity feed.
