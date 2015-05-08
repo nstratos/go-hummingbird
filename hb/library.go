@@ -6,6 +6,15 @@ import (
 	"time"
 )
 
+// Library entry statuses.
+const (
+	StatusCurrentlyWatching = "currently-watching"
+	StatusPlanToWatch       = "plan-to-watch"
+	StatusCompleted         = "completed"
+	StatusOnHold            = "on-hold"
+	StatusDropped           = "dropped"
+)
+
 // LibraryEntry represents a library entry of a Hummingbird user.
 type LibraryEntry struct {
 	ID              int                 `json:"id,omitempty"`

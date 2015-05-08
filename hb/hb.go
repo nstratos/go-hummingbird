@@ -10,15 +10,6 @@ import (
 	"net/url"
 )
 
-// Library entry statuses.
-const (
-	StatusCurrentlyWatching = "currently-watching"
-	StatusPlanToWatch       = "plan-to-watch"
-	StatusCompleted         = "completed"
-	StatusOnHold            = "on-hold"
-	StatusDropped           = "dropped"
-)
-
 const (
 	defaultBaseURL = "https://hummingbird.me/"
 )
