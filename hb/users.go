@@ -172,10 +172,17 @@ func (s *UserService) FavoriteAnime(username string) ([]Anime, *http.Response, e
 	return anime, resp, nil
 }
 
-// Library returns an array of library entry objects, without genres,
-// representing a user's anime library entries.
+// Library gets a user's library. It returns an array of library entry
+// objects, without genres, representing the user's anime library entries.
 //
 // Does not require authentication.
+//
+// status can be one of:
+//   hb.StatusCurrentlyWatching
+//   hb.StatusPlanToWatch
+//   hb.StatusCompleted
+//   hb.StatusOnHold
+//   hb.StatusDropped
 func (s *UserService) Library(username, status string) ([]LibraryEntry, *http.Response, error) {
 	urlStr := fmt.Sprintf("api/v1/users/%s/library", username)
 
