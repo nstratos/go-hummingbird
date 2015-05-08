@@ -6,21 +6,6 @@ import (
 )
 
 // LibraryEntry represents a library entry of a Hummingbird user.
-// Response looks like:
-//   {
-//     "id": 5593549,
-//     "episodes_watched": 20,
-//     "last_watched": "2014-06-20T05:31:27.074Z",
-//     "updated_at": "2014-08-18T16:04:05.383Z",
-//     "rewatched_times": 0,
-//     "notes": "",
-//     "notes_present": false,
-//     "status": "currently-watching",
-//     "private": false,
-//     "rewatching": false,
-//     "anime": { *omitted* },
-//     "rating": { *omitted* }
-//   }
 type LibraryEntry struct {
 	ID              int                 `json:"id"`
 	EpisodesWatched int                 `json:"episodes_watched"`

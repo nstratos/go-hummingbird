@@ -3,31 +3,6 @@ package hb
 import "fmt"
 
 // Anime represents a hummingbird anime object.
-// An anime response looks like:
-//   {
-//     "id": 7622,
-//     "slug": "log-horizon",
-//     "status": "Finished Airing",
-//     "url": "https://hummingbird.me/anime/log-horizon",
-//     "title": "Log Horizon",
-//     "alternate_title": "",
-//     "episode_count": 25,
-//     "episode_length": 25,
-//     "cover_image": "https://static.hummingbird.me/anime/poster_images/000/007/622/large/b0012149_5229cf3c7f4ee.jpg?1408461927",
-//     "synopsis": "The story begins when 30,000 Japanese gamers are trapped in the fantasy online game world Elder Tale. What was once a sword-and-sorcery world is now the real world. The main lead Shiroe attempts to survive with his old friend Naotsugu and the beautiful assassin Akatsuki.\r\n(Source: ANN)",
-//     "show_type": "TV",
-//     "started_airing": "2013-10-05",
-//     "finished_airing": "2014-03-22",
-//     "community_rating": 4.16741419054807,
-//     "age_rating": "PG13",
-//     "genres": [
-//       { "name": "Action" },
-//       { "name": "Adventure" },
-//       { "name": "Magic" },
-//       { "name": "Fantasy" },
-//       { "name": "Game" }
-//     ]
-//   }
 type Anime struct {
 	ID              int     `json:"id,omitempty"`
 	Slug            string  `json:"slug,omitempty"`

@@ -6,28 +6,6 @@ import (
 )
 
 // User represents a Hummingbird user.
-// Response looks like:
-//   {
-//     "name": "erengy",
-//     "waifu": "Taiga Aisaka",
-//     "waifu_or_husbando": "Waifu",
-//     "waifu_slug": "toradora",
-//     "waifu_char_id": "25930",
-//     "location": "",
-//     "website": "http://erengy.com",
-//     "avatar": "http://static.hummingbird.me/users/avatars/000/002/516/thumb/hb-avatar.jpg?1393289118",
-//     "cover_image": "http://static.hummingbird.me/users/cover_images/000/002/516/thumb/hummingbird_cover.jpg?1392287635",
-//     "about": null,
-//     "bio": "Hi.",
-//     "karma": 0,
-//     "life_spent_on_anime": 114520,
-//     "show_adult_content": true,
-//     "title_language_preference": "canonical",
-//     "last_library_update": "2014-06-21T19:28:00.443Z",
-//     "online": false,
-//     "following": false,
-//     "favorites": [ *omitted* ]
-//   }
 type User struct {
 	Name                    string     `json:"name,omitempty"`
 	Waifu                   string     `json:"waifu,omitempty"`
@@ -51,14 +29,6 @@ type User struct {
 }
 
 // UserMini represents a Hummingbird user with minimum info.
-// Response looks like:
-//   {
-//     "name": "erengy",
-//     "url": "http://hummingbird.me/users/erengy",
-//     "avatar": "http://static.hummingbird.me/users/avatars/000/002/516/thumb/hb-avatar.jpg?1393289118",
-//     "avatar_small": "http://static.hummingbird.me/users/avatars/000/002/516/thumb_small/hb-avatar.jpg?1393289118",
-//     "nb": false
-//   }
 type UserMini struct {
 	Name        string `json:"name,omitempty"`
 	URL         string `json:"url,omitempty"`
@@ -68,16 +38,6 @@ type UserMini struct {
 }
 
 // Favorite represents a favorite item of a Hummingbird user.
-// Response looks like:
-//   {
-//     "id": 87118,
-//     "user_id": 2516,
-//     "item_id": 3936,
-//     "item_type": "Anime",
-//     "created_at": "2014-04-25T11:50:34.831Z",
-//     "updated_at": "2014-04-25T11:50:34.831Z",
-//     "fav_rank": 9999
-//   }
 type Favorite struct {
 	ID        int       `json:"id"`
 	UserID    int       `json:"user_id"`
@@ -149,17 +109,6 @@ func (s *UserService) Get(username string) (*User, error) {
 }
 
 // Story represents a Hummingbird Story object such as user's activity feed.
-// Response looks like:
-//   {
-//     "id": 2640597,
-//     "story_type": "comment",
-//     "user": { *omitted* },
-//     "updated_at": "2014-06-21T10:37:36.730Z",
-//     "self_post": false,
-//     "poster": { *omitted* },
-//     "substories_count": 1,
-//     "substories": [ *omitted* ]
-//   }
 type Story struct {
 	ID              int        `json:"id"`
 	StoryType       string     `json:"story_type"`
@@ -172,15 +121,6 @@ type Story struct {
 }
 
 // Substory represents a Hummingbird Substory object.
-// Response looks like:
-//   {
-//     "id": 6590163,
-//     "substory_type": "watched_episode",
-//     "created_at": "2014-06-23T21:25:49.084Z",
-//     "episode_number": "12",
-//     "service": null,  // should be ignored
-//     "permissions": {} // should be ignored
-//   }
 type Substory struct {
 	ID            int        `json:"id"`
 	SubstoryType  string     `json:"substory_type"`
