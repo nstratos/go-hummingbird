@@ -59,9 +59,9 @@ type UserService struct {
 }
 
 type auth struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Username string `json:"username,omitempty"`
+	Email    string `json:"email,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 // Authenticate a user and return an authentication token if successful. That
@@ -69,7 +69,7 @@ type auth struct {
 // username and email only one is needed.
 func (s *UserService) Authenticate(username, email, password string) (string, *http.Response, error) {
 	if username == "" && email == "" {
-		return "", nil, fmt.Errorf("username or email must be provided")
+		return "", nil, fmt.Errorf("hb: username or email must be provided")
 	}
 
 	const urlStr = "api/v1/users/authenticate"
