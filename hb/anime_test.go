@@ -18,7 +18,7 @@ func TestAnimeService_Get(t *testing.T) {
 		fmt.Fprintf(w, `{"title":"Log Horizon"}`)
 	})
 
-	anime, err := client.Anime.Get("log-horizon", "english")
+	anime, _, err := client.Anime.Get("log-horizon", "english")
 	if err != nil {
 		t.Errorf("Anime.Get returned error %v", err)
 	}
@@ -40,9 +40,13 @@ func TestAnimeService_Get_notFound(t *testing.T) {
 		http.Error(w, "not found", http.StatusNotFound)
 	})
 
-	_, err := client.Anime.Get("invalid-anime", "")
+	_, resp, err := client.Anime.Get("invalid-anime", "")
 	if err == nil {
-		t.Errorf("Expected HTTP 404 error.")
+		t.Error("Expected HTTP 404 error.")
+	}
+
+	if resp == nil {
+		t.Error("Expected to return HTTP response despite the API error.")
 	}
 }
 
@@ -50,9 +54,13 @@ func TestAnimeService_Get_badAnimeID(t *testing.T) {
 	c := NewClient(nil)
 	animeID := "%foo"
 
-	_, err := c.Anime.Get(animeID, "")
+	_, resp, err := c.Anime.Get(animeID, "")
 	if err == nil {
 		t.Error("Expected invalid URL escape error.")
+	}
+
+	if resp != nil {
+		t.Error("Expected nil HTTP response when NewRequest fails.")
 	}
 }
 
@@ -66,7 +74,7 @@ func TestAnimeService_Search(t *testing.T) {
 		fmt.Fprintf(w, `[{"title":"Log Horizon1"},{"title":"Log Horizon2"}]`)
 	})
 
-	result, err := client.Anime.Search("log horizon")
+	result, _, err := client.Anime.Search("log horizon")
 	if err != nil {
 		t.Errorf("Anime.Search returned error %v", err)
 	}
@@ -87,8 +95,12 @@ func TestAnimeService_Search_httpError(t *testing.T) {
 		http.Error(w, "something broke", http.StatusInternalServerError)
 	})
 
-	_, err := client.Anime.Search("log horizon")
+	_, resp, err := client.Anime.Search("log horizon")
 	if err == nil {
 		t.Errorf("Expected HTTP 500 error.")
+	}
+
+	if resp == nil {
+		t.Error("Expected to return HTTP response despite the API error.")
 	}
 }

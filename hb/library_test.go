@@ -21,7 +21,7 @@ func TestLibraryService_Update(t *testing.T) {
 
 	entry := &Entry{EpisodesWatched: 3, IncrementEpisodes: true}
 
-	libraryEntry, err := client.Library.Update("log-horizon", "valid_user_token", entry)
+	libraryEntry, _, err := client.Library.Update("log-horizon", "valid_user_token", entry)
 	if err != nil {
 		t.Errorf("Library.Update returned error %v", err)
 	}
@@ -44,7 +44,7 @@ func TestLibraryService_Update_invalidToken(t *testing.T) {
 		http.Error(w, `{"error": "Invalid authentication token"}`, http.StatusUnauthorized)
 	})
 
-	_, err := client.Library.Update("log-horizon", "invalid_user_token", nil)
+	_, resp, err := client.Library.Update("log-horizon", "invalid_user_token", nil)
 	if err == nil {
 		t.Error("Expected HTTP 401 error.")
 	}
@@ -53,15 +53,23 @@ func TestLibraryService_Update_invalidToken(t *testing.T) {
 	if got := err.Error(); got != want {
 		t.Errorf("ErrorResponse is %v, want %v", got, want)
 	}
+
+	if resp == nil {
+		t.Error("Expected to return HTTP response despite the API error.")
+	}
 }
 
 func TestLibraryService_Update_badAnimeID(t *testing.T) {
 	c := NewClient(nil)
 	animeID := "%foo"
 
-	_, err := c.Library.Update(animeID, "", nil)
+	_, resp, err := c.Library.Update(animeID, "", nil)
 	if err == nil {
 		t.Error("Expected invalid URL escape error.")
+	}
+
+	if resp != nil {
+		t.Error("Expected nil HTTP response when NewRequest fails.")
 	}
 }
 
@@ -77,7 +85,7 @@ func TestLibraryService_Remove(t *testing.T) {
 		fmt.Fprintf(w, `true`)
 	})
 
-	removed, err := client.Library.Remove("log-horizon", "valid_user_token")
+	removed, _, err := client.Library.Remove("log-horizon", "valid_user_token")
 	if err != nil {
 		t.Errorf("Library.Remove returned error %v", err)
 	}
@@ -99,7 +107,7 @@ func TestLibraryService_invalidToken(t *testing.T) {
 		http.Error(w, `{"error": "Invalid authentication token"}`, http.StatusUnauthorized)
 	})
 
-	removed, err := client.Library.Remove("log-horizon", "invalid_user_token")
+	removed, resp, err := client.Library.Remove("log-horizon", "invalid_user_token")
 	if err == nil {
 		t.Error("Expected HTTP 401 error.")
 	}
@@ -112,14 +120,22 @@ func TestLibraryService_invalidToken(t *testing.T) {
 	if got := err.Error(); got != want {
 		t.Errorf("ErrorResponse is %v, want %v", got, want)
 	}
+
+	if resp == nil {
+		t.Error("Expected to return HTTP response despite the API error.")
+	}
 }
 
 func TestLibraryService_Remove_badAnimeID(t *testing.T) {
 	c := NewClient(nil)
 	animeID := "%foo"
 
-	_, err := c.Library.Remove(animeID, "")
+	_, resp, err := c.Library.Remove(animeID, "")
 	if err == nil {
 		t.Error("Expected invalid URL escape error.")
+	}
+
+	if resp != nil {
+		t.Error("Expected nil HTTP response when NewRequest fails.")
 	}
 }

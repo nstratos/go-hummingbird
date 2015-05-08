@@ -2,6 +2,7 @@ package hb
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 )
 
@@ -66,9 +67,9 @@ type auth struct {
 // Authenticate a user and return an authentication token if successful. That
 // token can be used in other methods that require authentication. From
 // username and email only one is needed.
-func (s *UserService) Authenticate(username, email, password string) (string, error) {
+func (s *UserService) Authenticate(username, email, password string) (string, *http.Response, error) {
 	if username == "" && email == "" {
-		return "", fmt.Errorf("username or email must be provided")
+		return "", nil, fmt.Errorf("username or email must be provided")
 	}
 
 	const urlStr = "api/v1/users/authenticate"
@@ -77,35 +78,35 @@ func (s *UserService) Authenticate(username, email, password string) (string, er
 
 	req, err := s.client.NewRequest("POST", urlStr, auth)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	var token string
-	_, err = s.client.Do(req, &token)
+	resp, err := s.client.Do(req, &token)
 	if err != nil {
-		return "", err
+		return "", resp, err
 	}
 
-	return token, nil
+	return token, resp, nil
 }
 
 // Get information about a user.
 //
 // Does not require authentication.
-func (s *UserService) Get(username string) (*User, error) {
+func (s *UserService) Get(username string) (*User, *http.Response, error) {
 	urlStr := fmt.Sprintf("api/v1/users/%s", username)
 
 	req, err := s.client.NewRequest("GET", urlStr, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	user := new(User)
-	_, err = s.client.Do(req, user)
+	resp, err := s.client.Do(req, user)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
-	return user, nil
+	return user, resp, nil
 }
 
 // Story represents a Hummingbird Story object such as user's activity feed.
@@ -131,52 +132,52 @@ type Substory struct {
 // Feed returns a user's activity feed.
 //
 // Does not require authentication.
-func (s *UserService) Feed(username string) ([]Story, error) {
+func (s *UserService) Feed(username string) ([]Story, *http.Response, error) {
 	urlStr := fmt.Sprintf("api/v1/users/%s/feed", username)
 
 	req, err := s.client.NewRequest("GET", urlStr, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var stories []Story
-	_, err = s.client.Do(req, &stories)
+	resp, err := s.client.Do(req, &stories)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
-	return stories, nil
+	return stories, resp, nil
 }
 
 // FavoriteAnime returns the user's favorite anime in
 // an array of Anime objects.
 //
 // Does not require authentication.
-func (s *UserService) FavoriteAnime(username string) ([]Anime, error) {
+func (s *UserService) FavoriteAnime(username string) ([]Anime, *http.Response, error) {
 	urlStr := fmt.Sprintf("api/v1/users/%s/favorite_anime", username)
 
 	req, err := s.client.NewRequest("GET", urlStr, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var anime []Anime
-	_, err = s.client.Do(req, &anime)
+	resp, err := s.client.Do(req, &anime)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
-	return anime, nil
+	return anime, resp, nil
 }
 
 // Library returns an array of library entry objects, without genres,
 // representing a user's anime library entries.
 //
 // Does not require authentication.
-func (s *UserService) Library(username, status string) ([]LibraryEntry, error) {
+func (s *UserService) Library(username, status string) ([]LibraryEntry, *http.Response, error) {
 	urlStr := fmt.Sprintf("api/v1/users/%s/library", username)
 
 	req, err := s.client.NewRequest("GET", urlStr, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	v := req.URL.Query()
@@ -184,9 +185,9 @@ func (s *UserService) Library(username, status string) ([]LibraryEntry, error) {
 	req.URL.RawQuery = v.Encode()
 
 	var entries []LibraryEntry
-	_, err = s.client.Do(req, &entries)
+	resp, err := s.client.Do(req, &entries)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
-	return entries, nil
+	return entries, resp, nil
 }

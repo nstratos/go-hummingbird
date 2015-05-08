@@ -17,7 +17,7 @@ func TestUserService_Authenticate(t *testing.T) {
 		fmt.Fprintf(w, `"token1234"`)
 	})
 
-	token, err := client.User.Authenticate("TestUser", "", "TestPass")
+	token, _, err := client.User.Authenticate("TestUser", "", "TestPass")
 	if err != nil {
 		t.Errorf("User.Authenticate returned error %v", err)
 	}
@@ -36,17 +36,25 @@ func TestUserService_Authenticate_unauthorized(t *testing.T) {
 		http.Error(w, `{"error":"invalid credentials"}`, http.StatusUnauthorized)
 	})
 
-	_, err := client.User.Authenticate("InvalidTestUser", "", "TestPass")
+	_, resp, err := client.User.Authenticate("InvalidTestUser", "", "TestPass")
 	if err == nil {
 		t.Error("Expected HTTP 401 error.")
+	}
+
+	if resp == nil {
+		t.Error("Expected to return HTTP response despite the API error.")
 	}
 }
 
 func TestUserService_Authenticate_credentialsNotSet(t *testing.T) {
 	c := NewClient(nil)
-	_, err := c.User.Authenticate("", "", "")
+	_, resp, err := c.User.Authenticate("", "", "")
 	if err == nil {
 		t.Errorf("Expected username or email must be provided error.")
+	}
+
+	if resp != nil {
+		t.Error("Expected nil HTTP response when credentials not set error.")
 	}
 }
 
@@ -60,7 +68,7 @@ func TestUserService_Get(t *testing.T) {
 		fmt.Fprintf(w, `{"name":"TestUser","bio":"My bio."}`)
 	})
 
-	user, err := client.User.Get("TestUser")
+	user, _, err := client.User.Get("TestUser")
 	if err != nil {
 		t.Errorf("User.Get returned error %v", err)
 	}
@@ -81,9 +89,13 @@ func TestUserService_Get_notFound(t *testing.T) {
 		http.Error(w, "not found", http.StatusNotFound)
 	})
 
-	_, err := client.User.Get("TestUser")
+	_, resp, err := client.User.Get("TestUser")
 	if err == nil {
 		t.Error("Expected HTTP 404 error.")
+	}
+
+	if resp == nil {
+		t.Error("Expected to return HTTP response despite the API error.")
 	}
 }
 
@@ -91,9 +103,13 @@ func TestUserService_Get_badUsername(t *testing.T) {
 	c := NewClient(nil)
 	username := "%foo"
 
-	_, err := c.User.Get(username)
+	_, resp, err := c.User.Get(username)
 	if err == nil {
 		t.Error("Expected invalid URL escape error.")
+	}
+
+	if resp != nil {
+		t.Error("Expected nil HTTP response when NewRequest fails.")
 	}
 }
 
@@ -107,7 +123,7 @@ func TestUserService_Feed(t *testing.T) {
 		fmt.Fprintf(w, `[{"id":1,"story_type":"comment"},{"id":2,"story_type":"media_story"}]`)
 	})
 
-	stories, err := client.User.Feed("TestUser")
+	stories, _, err := client.User.Feed("TestUser")
 	if err != nil {
 		t.Errorf("User.Feed returned error %v", err)
 	}
@@ -128,9 +144,13 @@ func TestUserService_Feed_notFound(t *testing.T) {
 		http.Error(w, "not found", http.StatusNotFound)
 	})
 
-	_, err := client.User.Feed("TestUser")
+	_, resp, err := client.User.Feed("TestUser")
 	if err == nil {
 		t.Error("Expected HTTP 404 error.")
+	}
+
+	if resp == nil {
+		t.Error("Expected to return HTTP response despite the API error.")
 	}
 }
 
@@ -138,9 +158,13 @@ func TestUserService_Feed_badUsername(t *testing.T) {
 	c := NewClient(nil)
 	username := "%foo"
 
-	_, err := c.User.Feed(username)
+	_, resp, err := c.User.Feed(username)
 	if err == nil {
 		t.Error("Expected invalid URL escape error.")
+	}
+
+	if resp != nil {
+		t.Error("Expected nil HTTP response when NewRequest fails.")
 	}
 }
 
@@ -154,7 +178,7 @@ func TestUserService_FavoriteAnime(t *testing.T) {
 		fmt.Fprintf(w, `[{"title":"Log Horizon"},{"title":"Nichijou"}]`)
 	})
 
-	anime, err := client.User.FavoriteAnime("TestUser")
+	anime, _, err := client.User.FavoriteAnime("TestUser")
 	if err != nil {
 		t.Errorf("User.FavoriteAnime returned error %v", err)
 	}
@@ -175,9 +199,13 @@ func TestUserService_FavoriteAnime_notFound(t *testing.T) {
 		http.Error(w, "not found", http.StatusNotFound)
 	})
 
-	_, err := client.User.FavoriteAnime("InvalidUser")
+	_, resp, err := client.User.FavoriteAnime("InvalidUser")
 	if err == nil {
 		t.Error("Expected HTTP 404 error.")
+	}
+
+	if resp == nil {
+		t.Error("Expected to return HTTP response despite the API error.")
 	}
 }
 
@@ -185,9 +213,13 @@ func TestUserService_FavoriteAnime_badUsername(t *testing.T) {
 	c := NewClient(nil)
 	username := "%foo"
 
-	_, err := c.User.FavoriteAnime(username)
+	_, resp, err := c.User.FavoriteAnime(username)
 	if err == nil {
 		t.Error("Expected invalid URL escape error.")
+	}
+
+	if resp != nil {
+		t.Error("Expected nil HTTP response when NewRequest fails.")
 	}
 }
 
@@ -211,7 +243,7 @@ func TestUserService_Library(t *testing.T) {
 			`)
 	})
 
-	entries, err := client.User.Library("TestUser", "currently-watching")
+	entries, _, err := client.User.Library("TestUser", "currently-watching")
 	if err != nil {
 		t.Errorf("User.Library returned error %v", err)
 	}
@@ -240,9 +272,13 @@ func TestUserService_Library_notFound(t *testing.T) {
 		http.Error(w, "not found", http.StatusNotFound)
 	})
 
-	_, err := client.User.Library("InvalidTestUser", "currently-watching")
+	_, resp, err := client.User.Library("InvalidTestUser", "currently-watching")
 	if err == nil {
 		t.Error("Expected HTTP 404 error.")
+	}
+
+	if resp == nil {
+		t.Error("Expected to return HTTP response despite the API error.")
 	}
 }
 
@@ -250,8 +286,12 @@ func TestUserService_Library_badUsername(t *testing.T) {
 	c := NewClient(nil)
 	username := "%foo"
 
-	_, err := c.User.Library(username, "")
+	_, resp, err := c.User.Library(username, "")
 	if err == nil {
 		t.Error("Expected invalid URL escape error.")
+	}
+
+	if resp != nil {
+		t.Error("Expected nil HTTP response when NewRequest fails.")
 	}
 }

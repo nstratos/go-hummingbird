@@ -2,6 +2,7 @@ package hb
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 )
 
@@ -136,7 +137,7 @@ type Entry struct {
 //
 // An optional entry parameter can be specified with additional values to
 // add/update on a user's library entry.
-func (s *LibraryService) Update(animeID, authToken string, entry *Entry) (*LibraryEntry, error) {
+func (s *LibraryService) Update(animeID, authToken string, entry *Entry) (*LibraryEntry, *http.Response, error) {
 	urlStr := fmt.Sprintf("api/v1/libraries/%v", animeID)
 
 	if entry == nil {
@@ -147,15 +148,15 @@ func (s *LibraryService) Update(animeID, authToken string, entry *Entry) (*Libra
 
 	req, err := s.client.NewRequest("POST", urlStr, entry)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	libraryEntry := new(LibraryEntry)
-	_, err = s.client.Do(req, libraryEntry)
+	resp, err := s.client.Do(req, libraryEntry)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
-	return libraryEntry, nil
+	return libraryEntry, resp, nil
 }
 
 // Remove removes an entry from the user's library.
@@ -166,19 +167,19 @@ func (s *LibraryService) Update(animeID, authToken string, entry *Entry) (*Libra
 //   c := hb.NewClient(nil)
 //   token, err := c.User.Authenticate("USER_HUMMINGBIRD_USERNAME", "", "USER_HUMMINGBIRD_PASSWORD")
 //   // handle err
-func (s *LibraryService) Remove(animeID, authToken string) (bool, error) {
+func (s *LibraryService) Remove(animeID, authToken string) (bool, *http.Response, error) {
 	urlStr := fmt.Sprintf("api/v1/libraries/%v/remove", animeID)
 
 	entry := &Entry{ID: animeID, AuthToken: authToken}
 	req, err := s.client.NewRequest("POST", urlStr, entry)
 	if err != nil {
-		return false, err
+		return false, nil, err
 	}
 
 	removed := false
-	_, err = s.client.Do(req, &removed)
+	resp, err := s.client.Do(req, &removed)
 	if err != nil {
-		return false, err
+		return false, resp, err
 	}
-	return removed, nil
+	return removed, resp, nil
 }

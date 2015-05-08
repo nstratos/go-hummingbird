@@ -1,6 +1,9 @@
 package hb
 
-import "fmt"
+import (
+	"fmt"
+	"net/http"
+)
 
 // Anime represents a hummingbird anime object.
 type Anime struct {
@@ -44,12 +47,12 @@ type AnimeService struct {
 // If omitted, "canonical" will be used.
 //
 // Does not require authentication.
-func (s *AnimeService) Get(animeID, titleLangPref string) (*Anime, error) {
+func (s *AnimeService) Get(animeID, titleLangPref string) (*Anime, *http.Response, error) {
 	urlStr := fmt.Sprintf("api/v1/anime/%s", animeID)
 
 	req, err := s.client.NewRequest("GET", urlStr, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if titleLangPref != "" {
@@ -59,23 +62,23 @@ func (s *AnimeService) Get(animeID, titleLangPref string) (*Anime, error) {
 	}
 
 	anime := new(Anime)
-	_, err = s.client.Do(req, anime)
+	resp, err := s.client.Do(req, anime)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
-	return anime, nil
+	return anime, resp, nil
 }
 
 // Search allows searching anime by title. It returns an array of anime objects
 // (5 max) without genres. It supports fuzzy search.
 //
 // Does not require authentication.
-func (s *AnimeService) Search(query string) ([]Anime, error) {
+func (s *AnimeService) Search(query string) ([]Anime, *http.Response, error) {
 	const urlStr = "api/v1/search/anime"
 
 	req, err := s.client.NewRequest("GET", urlStr, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	v := req.URL.Query()
@@ -83,9 +86,9 @@ func (s *AnimeService) Search(query string) ([]Anime, error) {
 	req.URL.RawQuery = v.Encode()
 
 	var anime []Anime
-	_, err = s.client.Do(req, &anime)
+	resp, err := s.client.Do(req, &anime)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
-	return anime, nil
+	return anime, resp, nil
 }
