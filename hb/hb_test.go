@@ -4,11 +4,43 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"reflect"
 	"strings"
 	"testing"
 )
+
+var (
+	// client is the Hummingbird client that is being tested.
+	client *Client
+
+	// server is a test HTTP server that is being started on each test with
+	// setup() to provide mock API responses.
+	server *httptest.Server
+
+	// mux is the HTTP request multiplexer that the test HTTP server uses.
+	mux *http.ServeMux
+)
+
+// setup sets up a test HTTP server and a hb.Client configured to use the URL
+// of the test server. Each test should register handlers on the test HTTP
+// server mux to handle the specific request they need and to provide a mock
+// API response similar to the real one.
+func setup() {
+	// Starting new test server with mux as it's multiplexer.
+	mux = http.NewServeMux()
+	server = httptest.NewServer(mux)
+
+	// Setting up hb.Client to use the test HTTP server URL.
+	client = NewClient(nil)
+	client.BaseURL, _ = url.Parse(server.URL)
+}
+
+// teardown closes the test HTTP server.
+func teardown() {
+	server.Close()
+}
 
 func testMethod(t *testing.T, r *http.Request, want string) {
 	if got := r.Method; got != want {
