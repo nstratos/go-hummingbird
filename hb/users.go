@@ -40,13 +40,13 @@ type UserMini struct {
 
 // Favorite represents a favorite item of a Hummingbird user.
 type Favorite struct {
-	ID        int       `json:"id"`
-	UserID    int       `json:"user_id"`
-	ItemID    int       `json:"item_id"`
-	ItemType  string    `json:"item_type"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	FavRank   int       `json:"fav_rank"`
+	ID        int        `json:"id,omitempty"`
+	UserID    int        `json:"user_id,omitempty"`
+	ItemID    int        `json:"item_id,omitempty"`
+	ItemType  string     `json:"item_type,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	FavRank   int        `json:"fav_rank,omitempty"`
 }
 
 // UserService handles communication with the user methods of
@@ -111,22 +111,22 @@ func (s *UserService) Get(username string) (*User, *http.Response, error) {
 
 // Story represents a Hummingbird Story object such as user's activity feed.
 type Story struct {
-	ID              int        `json:"id"`
-	StoryType       string     `json:"story_type"`
-	User            *UserMini  `json:"user"`
-	UpdatedAt       *time.Time `json:"updated_at"`
-	SelfPost        bool       `json:"self_post"`
-	Poster          *UserMini  `json:"poster"`
-	SubstoriesCount int        `json:"substories_count"`
-	Substories      []Substory `json:"substories"`
+	ID              int        `json:"id",omitempty`
+	StoryType       string     `json:"story_type,omitempty"`
+	User            *UserMini  `json:"user,omitempty"`
+	UpdatedAt       *time.Time `json:"updated_at,omitempty"`
+	SelfPost        bool       `json:"self_post,omitempty"`
+	Poster          *UserMini  `json:"poster,omitempty"`
+	SubstoriesCount int        `json:"substories_count,omitempty"`
+	Substories      []Substory `json:"substories,omitempty"`
 }
 
 // Substory represents a Hummingbird Substory object.
 type Substory struct {
-	ID            int        `json:"id"`
-	SubstoryType  string     `json:"substory_type"`
-	CreatedAt     *time.Time `json:"created_at"`
-	EpisodeNumber string     `json:"episode_number"`
+	ID            int        `json:"id,omitempty"`
+	SubstoryType  string     `json:"substory_type,omitempty"`
+	CreatedAt     *time.Time `json:"created_at,omitempty"`
+	EpisodeNumber string     `json:"episode_number,omitempty"`
 }
 
 // Feed returns a user's activity feed.

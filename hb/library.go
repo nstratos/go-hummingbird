@@ -8,18 +8,18 @@ import (
 
 // LibraryEntry represents a library entry of a Hummingbird user.
 type LibraryEntry struct {
-	ID              int                 `json:"id"`
-	EpisodesWatched int                 `json:"episodes_watched"`
-	LastWatched     *time.Time          `json:"last_watched"`
-	UpdatedAt       *time.Time          `json:"updated_at"`
-	RewatchedTimes  int                 `json:"rewatched_times"`
-	Notes           string              `json:"notes"`
-	NotesPresent    bool                `json:"notes_present"`
-	Status          string              `json:"status"`
-	Private         bool                `json:"private"`
-	Rewatching      bool                `json:"rewatching"`
-	Anime           *Anime              `json:"anime"`
-	Rating          *LibraryEntryRating `json:"rating"`
+	ID              int                 `json:"id,omitempty"`
+	EpisodesWatched int                 `json:"episodes_watched,omitempty"`
+	LastWatched     *time.Time          `json:"last_watched,omitempty"`
+	UpdatedAt       *time.Time          `json:"updated_at,omitempty"`
+	RewatchedTimes  int                 `json:"rewatched_times,omitempty"`
+	Notes           string              `json:"notes,omitempty"`
+	NotesPresent    bool                `json:"notes_present,omitempty"`
+	Status          string              `json:"status,omitempty"`
+	Private         bool                `json:"private,omitempty"`
+	Rewatching      bool                `json:"rewatching,omitempty"`
+	Anime           *Anime              `json:"anime,omitempty"`
+	Rating          *LibraryEntryRating `json:"rating,omitempty"`
 }
 
 // LibraryEntryRating represents the rating of a user's library entry.
@@ -34,8 +34,8 @@ type LibraryEntry struct {
 //   2.4 <  "neutral"   > 3.6
 //   3.6 <= "positive" => 5
 type LibraryEntryRating struct {
-	Type  string `json:"type"`
-	Value string `json:"value"`
+	Type  string `json:"type,omitempty"`
+	Value string `json:"value,omitempty"`
 }
 
 // LibraryService handles communication with the Hummingbird API library
