@@ -146,12 +146,21 @@ type Entry struct {
 //
 // An optional entry parameter can be specified with additional values to
 // add/update on a user's library entry.
+//
+// Note: Although providing an entry status is optional, trying to add a library
+// entry including just the ID and the authentication token, doesn't seem to
+// actually be adding the entry in the user's library, even thought it succeeds
+// (201). In this special case the Hummingbird API is returning true/false
+// instead of the expected library entry response. For that reason if status is
+// not provided, the method will use "currently-watching" as the default status.
 func (s *LibraryService) Update(animeID, authToken string, entry *Entry) (*LibraryEntry, *http.Response, error) {
 	urlStr := fmt.Sprintf("api/v1/libraries/%v", animeID)
 
 	if entry == nil {
 		entry = new(Entry)
+		entry.Status = StatusCurrentlyWatching
 	}
+
 	entry.ID = animeID
 	entry.AuthToken = authToken
 

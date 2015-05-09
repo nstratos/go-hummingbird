@@ -32,13 +32,37 @@ func TestLibraryService_Update(t *testing.T) {
 	}
 }
 
+func TestLibraryService_Update_defaultStatus(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/libraries/", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		// if no entry is provided, default status "currently-watching" is added.
+		requestBody := `{"id":"log-horizon","auth_token":"valid_user_token","status":"currently-watching"}`
+		testBody(t, r, requestBody+"\n")
+		testResourceID(t, r, "log-horizon")
+		fmt.Fprintf(w, `{"id":7622,"status":"currently-watching"}`)
+	})
+
+	libraryEntry, _, err := client.Library.Update("log-horizon", "valid_user_token", nil)
+	if err != nil {
+		t.Errorf("Library.Update returned error %v", err)
+	}
+
+	got, want := libraryEntry, &LibraryEntry{ID: 7622, Status: StatusCurrentlyWatching}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("Library.Update libraryEntry is %v, want %v", got, want)
+	}
+}
+
 func TestLibraryService_Update_invalidToken(t *testing.T) {
 	setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/v1/libraries/", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		requestBody := `{"id":"log-horizon","auth_token":"invalid_user_token"}`
+		requestBody := `{"id":"log-horizon","auth_token":"invalid_user_token","status":"currently-watching"}`
 		testBody(t, r, requestBody+"\n")
 		testResourceID(t, r, "log-horizon")
 		http.Error(w, `{"error": "Invalid authentication token"}`, http.StatusUnauthorized)
