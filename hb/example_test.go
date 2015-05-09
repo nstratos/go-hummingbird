@@ -95,7 +95,7 @@ func ExampleUserService_Library() {
 // 	}
 // }
 
-/*func ExampleLibraryService_Update() {
+func ExampleLibraryService_Update() {
 	c := hb.NewClient(nil)
 
 	// Aquire user's authentication token.
@@ -104,7 +104,7 @@ func ExampleUserService_Library() {
 		log.Fatalf("token err = %v", err)
 	}
 
-	// Add nichijou to the user's library (as currently watching)
+	// Add nichijou to the user's library (Status currently watching is added by default).
 	c.Library.Update("nichijou", token, nil)
 
 	// Update nichijou increasing episodes watched by one
@@ -119,4 +119,20 @@ func ExampleUserService_Library() {
 	// Update nichijou setting status as completed and setting a note.
 	c.Library.Update("nichijou", token, &hb.Entry{Status: hb.StatusCompleted, Notes: "crazy"})
 
-}*/
+}
+
+func ExampleLibraryService_Remove() {
+	c := hb.NewClient(nil)
+
+	// Aquire user's authentication token.
+	token, _, err := c.User.Authenticate("USER_HUMMINGBIRD_USERNAME", "", "USER_HUMMINGBIRD_PASSWORD")
+	if err != nil {
+		log.Fatalf("token err = %v", err)
+	}
+
+	removed, _, err := c.Library.Remove("nichijou", token)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Anime was removed:", removed)
+}
