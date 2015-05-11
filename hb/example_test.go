@@ -81,19 +81,25 @@ func ExampleUserService_Library() {
 	}
 }
 
-// func ExampleUserService_Feed() {
-// 	c := hb.NewClient(nil)
+func ExampleUserService_Feed() {
+	c := hb.NewClient(nil)
 
-// 	stories, _, err := c.User.Feed("cybrox")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	for i, s := range stories {
-// 		fmt.Printf("--- Story #%d ---\n", i)
-// 		fmt.Println("Title:", s.Title)
-// 		fmt.Println("Synopsis:", s.Synopsis)
-// 	}
-// }
+	// This might return error 500 due to an issue:
+	// https://github.com/hummingbird-me/hummingbird/issues/539
+	stories, _, err := c.User.Feed("cybrox")
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, s := range stories {
+		if s.StoryType == "media_story" {
+			fmt.Printf("Anime: %v\n", s.Media.Title)
+			for k, ss := range s.Substories {
+				fmt.Printf("--- Comment #%d ---\n", k)
+				fmt.Println("", ss.Comment)
+			}
+		}
+	}
+}
 
 func ExampleLibraryService_Update() {
 	c := hb.NewClient(nil)
