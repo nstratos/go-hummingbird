@@ -2,7 +2,10 @@
 
 go-hummingbird is a Go library for accessing the [Hummingbird.me API](https://github.com/hummingbird-me/hummingbird/wiki/API-v1-Methods). Currently only v1 of the API is supported (v2 is still under development).
 
+[![GitHub license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
 [![GoDoc](https://godoc.org/github.com/nstratos/go-hummingbird/hb?status.svg)](https://godoc.org/github.com/nstratos/go-hummingbird/hb)
+[![Coverage Status](https://coveralls.io/repos/nstratos/go-hummingbird/badge.svg?branch=master)](https://coveralls.io/r/nstratos/go-hummingbird?branch=master)
+[![Build Status](https://drone.io/github.com/nstratos/go-hummingbird/status.png)](https://drone.io/github.com/nstratos/go-hummingbird/latest)
 
 ## Installation ##
 
@@ -30,6 +33,3 @@ entries, _, err := c.User.Library("cybrox", hb.StatusCurrentlyWatching)
 ```
 
 See more [examples](https://godoc.org/github.com/nstratos/go-hummingbird/hb#pkg-examples).
-
-## License ##
-[MIT](LICENSE)
