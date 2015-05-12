@@ -84,18 +84,17 @@ func ExampleUserService_Library() {
 func ExampleUserService_Feed() {
 	c := hb.NewClient(nil)
 
-	// This might return error 500 due to an issue:
-	// https://github.com/hummingbird-me/hummingbird/issues/539
 	stories, _, err := c.User.Feed("cybrox")
 	if err != nil {
 		log.Fatal(err)
 	}
 	for _, s := range stories {
-		if s.StoryType == "media_story" {
-			fmt.Printf("Anime: %v\n", s.Media.Title)
-			for k, ss := range s.Substories {
-				fmt.Printf("--- Comment #%d ---\n", k)
-				fmt.Println("", ss.Comment)
+		if s.StoryType == "comment" {
+			for _, ss := range s.Substories {
+				if ss.SubstoryType == "comment" {
+					fmt.Printf("%v said to %v:\n", s.Poster.Name, s.User.Name)
+					fmt.Printf("%v\n\n", ss.Comment)
+				}
 			}
 		}
 	}
