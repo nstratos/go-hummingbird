@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"bitbucket.org/nstratos/go-hummingbird/hb"
+	"github.com/nstratos/go-hummingbird/hb"
 )
 
 func ExampleAnimeService_Get() {
