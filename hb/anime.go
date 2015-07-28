@@ -8,6 +8,7 @@ import (
 // Anime represents a hummingbird anime object.
 type Anime struct {
 	ID              int     `json:"id,omitempty"`
+	MALID           int     `json:"mal_id,omitempty"`
 	Slug            string  `json:"slug,omitempty"`
 	Status          string  `json:"status,omitempty"`
 	URL             string  `json:"url,omitempty"`

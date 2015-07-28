@@ -237,7 +237,7 @@ func TestUserService_Library(t *testing.T) {
 			    "rating":{"type":"advanced", "value":"4.0"} 
 			  },
 			  { "id":23, "status":"currently-watching", 
-			    "anime":{"title":"Log Horizon"} 
+			    "anime":{"title":"Log Horizon", "mal_id":56} 
 			  }
 			]
 			`)
@@ -253,7 +253,7 @@ func TestUserService_Library(t *testing.T) {
 			Rating: &LibraryEntryRating{Type: "advanced", Value: "4.0"},
 		},
 		{ID: 23, Status: StatusCurrentlyWatching,
-			Anime: &Anime{Title: "Log Horizon"},
+			Anime: &Anime{Title: "Log Horizon", MALID: 56},
 		},
 	}
 	if !reflect.DeepEqual(got, want) {
