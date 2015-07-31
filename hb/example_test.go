@@ -81,6 +81,20 @@ func ExampleUserService_Library() {
 	}
 }
 
+func ExampleUserService_Library_getAllStatuses() {
+	c := hb.NewClient(nil)
+
+	entries, _, err := c.User.Library("cybrox", "")
+	if err != nil {
+		log.Fatal(err)
+	}
+	for i, e := range entries {
+		fmt.Printf("--- Library entry #%d ---\n", i+1)
+		fmt.Printf("Anime Title: %v\n", e.Anime.Title)
+		fmt.Printf("Episodes watched: %v\n\n", e.EpisodesWatched)
+	}
+}
+
 func ExampleUserService_Feed() {
 	c := hb.NewClient(nil)
 

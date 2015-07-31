@@ -1,4 +1,4 @@
 main.go
 go-hummingbird
 hb/cover.out
-.swp
+*.swp

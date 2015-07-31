@@ -183,6 +183,8 @@ func (s *UserService) FavoriteAnime(username string) ([]Anime, *http.Response, e
 //   hb.StatusCompleted
 //   hb.StatusOnHold
 //   hb.StatusDropped
+//
+// If omitted, results will include all statuses.
 func (s *UserService) Library(username, status string) ([]LibraryEntry, *http.Response, error) {
 	urlStr := fmt.Sprintf("api/v1/users/%s/library", username)
 
