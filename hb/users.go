@@ -111,7 +111,7 @@ func (s *UserService) Get(username string) (*User, *http.Response, error) {
 
 // Story represents a Hummingbird Story object such as a user's activity feed.
 type Story struct {
-	ID              int        `json:"id",omitempty`
+	ID              int        `json:"id,omitempty"`
 	StoryType       string     `json:"story_type,omitempty"`
 	User            *UserMini  `json:"user,omitempty"`
 	UpdatedAt       *time.Time `json:"updated_at,omitempty"`
