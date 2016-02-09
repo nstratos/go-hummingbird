@@ -117,7 +117,7 @@ func ExampleUserService_Feed() {
 func ExampleLibraryService_Update() {
 	c := hb.NewClient(nil)
 
-	// Aquire user's authentication token.
+	// Acquire user's authentication token.
 	token, _, err := c.User.Authenticate("USER_HUMMINGBIRD_USERNAME", "", "USER_HUMMINGBIRD_PASSWORD")
 	if err != nil {
 		log.Fatalf("token err = %v", err)
@@ -143,7 +143,7 @@ func ExampleLibraryService_Update() {
 func ExampleLibraryService_Remove() {
 	c := hb.NewClient(nil)
 
-	// Aquire user's authentication token.
+	// Acquire user's authentication token.
 	token, _, err := c.User.Authenticate("USER_HUMMINGBIRD_USERNAME", "", "USER_HUMMINGBIRD_PASSWORD")
 	if err != nil {
 		log.Fatalf("token err = %v", err)
