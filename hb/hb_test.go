@@ -101,6 +101,14 @@ func TestNewClient(t *testing.T) {
 	}
 }
 
+func TestNewClientHTTP(t *testing.T) {
+	c := NewClientHTTP(nil)
+
+	if got, want := c.BaseURL.String(), defaultBaseURL; got != want {
+		t.Errorf("Client BaseURL is %v, want %v", got, want)
+	}
+}
+
 func TestClient_NewRequest(t *testing.T) {
 	c := NewClient(nil)
 	inURL, outURL := "/foo", defaultBaseSecureURL+"foo"
