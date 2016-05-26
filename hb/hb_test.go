@@ -96,14 +96,14 @@ func testFormValues(t *testing.T, r *http.Request, values values) {
 func TestNewClient(t *testing.T) {
 	c := NewClient(nil)
 
-	if got, want := c.BaseURL.String(), defaultBaseURL; got != want {
+	if got, want := c.BaseURL.String(), defaultBaseSecureURL; got != want {
 		t.Errorf("Client BaseURL is %v, want %v", got, want)
 	}
 }
 
 func TestClient_NewRequest(t *testing.T) {
 	c := NewClient(nil)
-	inURL, outURL := "/foo", defaultBaseURL+"foo"
+	inURL, outURL := "/foo", defaultBaseSecureURL+"foo"
 	inBody, outBody := &User{Name: "TestUser"}, `{"name":"TestUser"}`+"\n"
 
 	req, _ := c.NewRequest("GET", inURL, inBody)

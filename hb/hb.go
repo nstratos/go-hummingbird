@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	defaultBaseURL = "https://hummingbird.me/"
+	defaultBaseURL       = "http://hummingbird.me/"
+	defaultBaseSecureURL = "https://hummingbird.me/"
 )
 
 // Client manages communication with the Hummingbird API.
@@ -27,6 +28,28 @@ type Client struct {
 
 // NewClient returns a new Hummingbird API client.
 func NewClient(httpClient *http.Client) *Client {
+	if httpClient == nil {
+		httpClient = http.DefaultClient
+	}
+	baseURL, _ := url.Parse(defaultBaseSecureURL)
+
+	c := &Client{client: httpClient, BaseURL: baseURL}
+
+	c.User = &UserService{client: c}
+	c.Anime = &AnimeService{client: c}
+	c.Library = &LibraryService{client: c}
+	return c
+}
+
+// NewClientHTTP returns a new Hummingbird API client that uses HTTP instead of
+// HTTPS. This is intended for the rare cases that Hummingbird API cannot be
+// accessed through HTTPS.
+//
+// See App Engine bug:
+// https://code.google.com/p/googleappengine/issues/detail?id=12588
+//
+// You should probably always use NewClient instead.
+func NewClientHTTP(httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
