@@ -123,20 +123,41 @@ func ExampleLibraryService_Update() {
 		log.Fatalf("token err = %v", err)
 	}
 
-	// Add nichijou to the user's library (Status currently watching is added by default).
-	c.Library.Update("nichijou", token, nil)
+	// Quick function to keep example shorter. For real code, always remember:
+	// "Don't just check errors, handle them gracefully."
+	checkErr := func(err error) {
+		if err != nil {
+			log.Println("Update failed:", err)
+		}
+	}
 
-	// Update nichijou increasing episodes watched by one
-	c.Library.Update("nichijou", token, &hb.Entry{IncrementEpisodes: true})
+	// Add anime Nichijou to the user's library. Providing nil will still add
+	// Status "Currently watching" by default.
+	_, _, err = c.Library.Update("nichijou", token, nil)
+	checkErr(err)
 
-	// Update nichijou setting status as on-hold
-	c.Library.Update("nichijou", token, &hb.Entry{Status: hb.StatusOnHold})
+	// Update Nichijou, increasing episodes watched by one.
+	_, _, err = c.Library.Update("nichijou", token, &hb.Entry{IncrementEpisodes: true})
+	checkErr(err)
 
-	// Update nichijou setting status as currently-watching and number of episodes watched as 5.
-	c.Library.Update("nichijou", token, &hb.Entry{Status: hb.StatusCurrentlyWatching, EpisodesWatched: 5})
+	// Update Nichijou, setting status as on-hold.
+	_, _, err = c.Library.Update("nichijou", token, &hb.Entry{Status: hb.StatusOnHold})
+	checkErr(err)
 
-	// Update nichijou setting status as completed and setting a note.
-	c.Library.Update("nichijou", token, &hb.Entry{Status: hb.StatusCompleted, Notes: "crazy"})
+	// Update Nichijou, setting status as currently-watching and number of
+	// episodes watched as 5.
+	_, _, err = c.Library.Update("nichijou", token, &hb.Entry{
+		Status:          hb.StatusCurrentlyWatching,
+		EpisodesWatched: 5,
+	})
+	checkErr(err)
+
+	// Update Nichijou, setting status as completed and setting a note.
+	_, _, err = c.Library.Update("nichijou", token, &hb.Entry{
+		Status: hb.StatusCompleted,
+		Notes:  "crazy",
+	})
+	checkErr(err)
 
 }
 
