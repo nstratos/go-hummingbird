@@ -74,9 +74,9 @@ func (s *UserService) Authenticate(username, email, password string) (string, *h
 
 	const urlStr = "api/v1/users/authenticate"
 
-	auth := auth{Username: username, Email: email, Password: password}
+	a := auth{Username: username, Email: email, Password: password}
 
-	req, err := s.client.NewRequest("POST", urlStr, auth)
+	req, err := s.client.NewRequest("POST", urlStr, a)
 	if err != nil {
 		return "", nil, err
 	}
